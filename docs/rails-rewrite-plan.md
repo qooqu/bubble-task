@@ -186,10 +186,15 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 
 ### PR 7: Production deployment
 - Fill in `config/deploy.yml`: server, registry, `proxy` host/SSL, and the storage volume.
-- Set up `.kamal/secrets`.
+- **Run Kamal without Ruby on the host.** Use the official `ghcr.io/basecamp/kamal` image, pinned to the version in `Gemfile.lock` (2.12.0 at PR 1). Wrap it in a short script so `kamal deploy` stays one command. The container needs:
+  - the repo mounted, plus the Docker socket so it can build and push the image
+  - the Mac's SSH agent, to reach the server. With Colima, start it with `colima start --ssh-agent` and mount the forwarded agent socket.
+  - `KAMAL_REGISTRY_PASSWORD` passed through from the host environment
+  - Hooks run inside this container, so they can only use tools the image has.
+- Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated) and `KAMAL_REGISTRY_PASSWORD` from the environment. No password manager integration: KeePass holds a backup of the master key only.
 - Kamal hooks in `.kamal/hooks/`:
   - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
-  - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead (e.g. `gh run list --commit`), and abort unless it succeeded.
+  - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead, and abort unless it succeeded. `gh` isn't in the Kamal image, so call the GitHub API directly (e.g. `curl` with a `GITHUB_TOKEN` passed in).
   - **Delete the other samples.** They only print messages.
 - Production SMTP settings and `default_url_options`, with credentials in `config/credentials.yml.enc`.
 - Outside the repo (do before merging): provision the VPS, point DNS at it, verify the domain with the mail provider and add its records.
