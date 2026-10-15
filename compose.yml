@@ -7,9 +7,11 @@ services:
     command: bin/setup
     environment:
       BINDING: 0.0.0.0
-      # Keep the pidfile out of the bind mount so a killed container can't leave a stale one behind.
+      # Keep the pidfile on the tmpfs below so a killed server can't leave a stale one behind.
       PIDFILE: /tmp/server.pid
       SELENIUM_HOST: chrome
+    # Wiped on every container start; /tmp in the container layer would survive `docker compose restart`.
+    tmpfs: /tmp
     ports:
       - "3000:3000"
     volumes:

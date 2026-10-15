@@ -23,12 +23,12 @@ The goal is a single Rails 8 app with these choices (all confirmed with the user
     - **`web` service:**
       - builds `Dockerfile.dev`
       - bind-mounts `.:/rails`, plus a named volume `bundle:/usr/local/bundle` so gems survive rebuilds
-      - publishes port `3000:3000` and runs `bin/rails server -b 0.0.0.0`
+      - publishes port `3000:3000`, runs `bin/setup` with `BINDING=0.0.0.0`, and keeps the pidfile on a `/tmp` tmpfs
       - sets `stdin_open: true` and `tty: true` so `docker compose attach web` reaches `debugger` breakpoints
       - SQLite files live in `storage/` on the bind mount (already gitignored)
     - **`chrome` service:** the `selenium/standalone-chromium` image (pinned tag) for system tests. When `SELENIUM_HOST` is set, `ApplicationSystemTestCase` drives that remote browser and uses `served_by host: "web"` so the browser can reach the test server.
 - Daily commands:
-  - start the app: `docker compose up`
+  - start the app: `docker compose up -d`
   - everything else: `docker compose exec web bin/rails …` (console, migrations, tests)
   - after a Gemfile change: `docker compose restart web` (`bin/setup` re-runs `bundle install`)
 
