@@ -180,6 +180,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 ### PR 6: Guest sandbox
 - Lazily create a guest user for logged-out visitors to `/`, seeded with jack, jill, build and sell. Relax `require_authentication` on the board, worker, task, progress and order controllers to allow guests.
 - Signing up as a guest converts the guest account, keeping its data. Logging in abandons it.
+- Signing up while logged in as a real (non-guest) user currently starts a second session and leaves the first open. Redirect those users away from sign-up instead.
 - `CleanupGuestsJob` in `config/recurring.yml`, deleting guests older than 7 days.
 - Nav and welcome text for guests.
 - **Tests:** an unauthenticated visit gets a seeded guest, guest-to-signup conversion keeps the data, and the cleanup job deletes only stale guests. Call the job directly in tests: only production uses Solid Queue, so `recurring.yml` doesn't run in development or test.
