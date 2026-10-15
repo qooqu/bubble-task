@@ -15,22 +15,22 @@ The goal is a single Rails 8 app with these choices (all confirmed with the user
 
 ## Setup
 - Branch `rails-rewrite`. Ruby isn't needed on the Mac, so generate the app from a throwaway container:
-  `docker run --rm -v "$PWD":/rails -w /rails ruby:<current stable> sh -c "gem install rails && rails new . --name=bubbletask --database=sqlite3 --skip-action-mailbox --skip-action-text --skip-active-storage"` (Rails 8.x).
+  `docker run --rm -v "$PWD":/rails -w /rails ruby:<current stable> sh -c "gem install rails && rails new . --name=bubble_task --database=sqlite3 --skip-action-mailbox --skip-action-text --skip-active-storage"` (Rails 8.x).
 - As the branch's first commit, delete the old code: `api/`, `web/`, the root `index.html` and `notes.md`. It stays readable on `main`, so the CSS, favicon and `Bubble.js` logic can be ported with `git show main:<path>`.
 - **Local dev runs in docker compose.** The generated `Dockerfile` stays production-only (Kamal uses it). Add separate dev files:
-  - `Dockerfile.dev`: the same `ruby` base image as the generated `Dockerfile`, plus `build-essential`, `libyaml-dev` and `sqlite3`. Runs a full `bundle install` that includes dev and test gems, and does no asset precompile.
+  - `Dockerfile.dev`: the same `ruby` slim base image as the generated `Dockerfile`, plus the packages needed to build gems and `sqlite3`. Gems aren't baked into the image: the `web` service runs `bin/setup`, which installs them (dev and test included) into the `bundle` volume, prepares the database and starts the server.
   - `compose.yml`:
     - **`web` service:**
       - builds `Dockerfile.dev`
       - bind-mounts `.:/rails`, plus a named volume `bundle:/usr/local/bundle` so gems survive rebuilds
-      - publishes port `3000:3000` and runs `bin/rails server -b 0.0.0.0`
+      - publishes port `3000:3000`, runs `bin/setup` with `BINDING=0.0.0.0`, and keeps the pidfile on a `/tmp` tmpfs
       - sets `stdin_open: true` and `tty: true` so `docker compose attach web` reaches `debugger` breakpoints
       - SQLite files live in `storage/` on the bind mount (already gitignored)
-    - **`chrome` service:** the `selenium/standalone-chromium` image for system tests. `ApplicationSystemTestCase` points at it with `SELENIUM_HOST`, and Capybara serves on `0.0.0.0` with an app host the container can reach.
+    - **`chrome` service:** the `selenium/standalone-chromium` image (pinned tag) for system tests. When `SELENIUM_HOST` is set, `ApplicationSystemTestCase` drives that remote browser and uses `served_by host: "web"` so the browser can reach the test server.
 - Daily commands:
-  - start the app: `docker compose up`
+  - start the app: `docker compose up -d`
   - everything else: `docker compose exec web bin/rails …` (console, migrations, tests)
-  - after a Gemfile change: `docker compose exec web bundle install`, or `docker compose build`
+  - after a Gemfile change: `docker compose restart web` (`bin/setup` re-runs `bundle install`)
 
 ## Data model
 | table | columns | notes |
@@ -102,7 +102,7 @@ resource :task_order,   only: :update  # TaskOrdersController,   params: ids[]
   - server IP
   - image registry (GHCR or Docker Hub)
   - `proxy: { ssl: true, host: <domain> }`
-  - keep the generated `bubbletask_storage:/rails/storage` volume, which is where the SQLite files live
+  - keep the generated `bubble_task_storage:/rails/storage` volume, which is where the SQLite files live
 - Secrets: put `RAILS_MASTER_KEY` and `KAMAL_REGISTRY_PASSWORD` in `.kamal/secrets`. The SMTP credentials live in Rails credentials, which the master key unlocks.
 - Create an account with the mail provider, verify the sending domain and add its DNS records before the first deploy.
 - Leave `SOLID_QUEUE_IN_PUMA=true` (the default) so the cleanup job runs without a separate worker.
@@ -124,7 +124,7 @@ Tests ship in the same PR as the code they cover. CI (the generated GitHub Actio
   - sign-up rejects a duplicate email (regardless of case) or an invalid one
   - password reset sends an email (`assert_emails`), and the token link sets a new password
 - **System test** (Capybara and Selenium): click a bubble through its full cycle, add a worker and a task, and drag one to the trash.
-- **Running tests:** `docker compose exec web bin/rails test` for model and integration tests, and `docker compose exec web bin/rails test:system` for system tests, which run against the `chrome` service.
+- **Running tests:** `docker compose exec web bin/ci` runs every check (the steps in `config/ci.rb`, matching GitHub Actions). For just the tests: `bin/rails test` for model and integration tests, and `bin/rails test:system` for system tests, which run against the `chrome` service.
 - **Manual:** run `docker compose up` and open http://localhost:3000. Go through the whole how-to list, request a password reset and check it at `/letter_opener`, and test a `debugger` breakpoint with `docker compose attach web`. Run `kamal deploy`, check HTTPS on the domain, and confirm a real reset email arrives.
 
 ## PR breakdown
@@ -142,14 +142,15 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
   - **Checks before a PR:** `bin/rubocop`, `bin/brakeman`, `bin/rails test`, `bin/rails test:system`. There is no type checker.
   - **Conventions:** every lookup goes through `Current.user.*`, controller actions respond with `turbo_stream.replace "board"`, tests use Minitest with fixtures (no RSpec), and login is by email (no usernames).
 
-### PR 1: Remove old app, scaffold Rails with a Docker dev setup
+### PR 1: Remove old app, scaffold Rails with a Docker dev setup: done
 - Delete `api/`, `web/`, the root `index.html` and `notes.md`.
 - Update `CLAUDE.md` with the real commands now that the app exists, including the `Dockerfile.dev`/`compose.yml` workflow.
 - Run `rails new` in a throwaway container (see Setup).
 - Add `Dockerfile.dev` and `compose.yml` with the `web` and `chrome` services. In `ApplicationSystemTestCase`, use the remote `chrome` service when `SELENIUM_HOST` is set, and fall back to local headless Chrome when it isn't (as on the GitHub Actions runner).
 - Keep the generated `.github/workflows/ci.yml`, `Dockerfile` and `config/deploy.yml` as they are; `deploy.yml` gets filled in during PR 7.
 - **Check:** `docker compose up` serves the Rails welcome page, and `docker compose exec web bin/rails test test:system` runs green (empty test suite). CI runs green on the PR.
-- **After the first CI run:** add a GitHub ruleset on `rails-rewrite` (and later `main`) that requires the CI checks to pass before merging. Set it up with `gh api`; the checks have to have run once before they can be required.
+- **After the first CI run:** add a GitHub ruleset on `rails-rewrite` that requires the CI checks to pass before merging. Set it up with `gh api`; the checks have to have run once before they can be required. (Done: ruleset "Require CI on rails-rewrite".)
+- `ci.yml` sets `permissions: contents: read`, so CI stays read-only even if the repo's default token permissions change.
 
 ### PR 2: Authentication
 - Run `bin/rails generate authentication`, with `email_address` and `password_digest` nullable and a `guest` column (defaults to false) added now so PR 6 needs no further migration.
@@ -185,12 +186,24 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 
 ### PR 7: Production deployment
 - Fill in `config/deploy.yml`: server, registry, `proxy` host/SSL, and the storage volume.
-- Set up `.kamal/secrets`.
+- **Run Kamal without Ruby on the host.** Use the official `ghcr.io/basecamp/kamal` image, pinned to the version in `Gemfile.lock` (2.12.0 at PR 1). Wrap it in a short script so `kamal deploy` stays one command. The container needs:
+  - the repo mounted, plus the Docker socket so it can build and push the image
+  - the Mac's SSH agent, to reach the server. With Colima, start it with `colima start --ssh-agent` and mount the forwarded agent socket.
+  - `KAMAL_REGISTRY_PASSWORD` passed through from the host environment
+  - Hooks run inside this container, so they can only use tools the image has.
+- Add `/.claude`, `/docs`, `/CLAUDE.md` and `/compose.yml` to `.dockerignore`, so dev-only files stay out of the production image.
+- Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated) and `KAMAL_REGISTRY_PASSWORD` from the environment. No password manager integration: KeePass holds a backup of the master key only.
+- Kamal hooks in `.kamal/hooks/`:
+  - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
+  - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead, and abort unless it succeeded. The Kamal image has neither `gh` nor `curl` (checked: v2.12.0), so keep the hook in Ruby like the sample and call the GitHub check-runs API with `Net::HTTP` and a `GITHUB_TOKEN` passed in.
+  - **Delete the other samples.** They only print messages.
 - Production SMTP settings and `default_url_options`, with credentials in `config/credentials.yml.enc`.
+- **Editing credentials:** the dev container has no text editor, so add `nano` to the packages in `Dockerfile.dev`, then run `docker compose exec -e EDITOR=nano web bin/rails credentials:edit`. Add the same command to CLAUDE.md's Environment section.
 - Outside the repo (do before merging): provision the VPS, point DNS at it, verify the domain with the mail provider and add its records.
-- **Check:** `kamal setup` and `kamal deploy` succeed, the site loads over HTTPS, a real reset email arrives, and the guest cleanup job shows up in Solid Queue.
+- **Check:** `kamal setup` and `kamal deploy` succeed, `pre-build` blocks a deploy with uncommitted changes, `pre-deploy` blocks a commit whose CI failed or hasn't run, the site loads over HTTPS, a real reset email arrives, and the guest cleanup job shows up in Solid Queue.
 
 ### Cutover (after PR 7)
 - Merge `rails-rewrite` into `main`.
+- Add `refs/heads/main` to the "Require CI on rails-rewrite" ruleset (or a copy of it), so `main` also requires the CI checks.
 - Turn off auto-deploy and shut down the Heroku app and the Netlify site.
 - Optional follow-up PR: Litestream backups.

@@ -12,15 +12,15 @@ A small task board: workers are columns, tasks are rows, and clicking a bubble a
 - Never target `main` before cutover. Netlify and Heroku may still auto-deploy the live app from it.
 
 ## Environment
-- There is no Ruby on the host. Run everything through `docker compose exec web …`, and start the app with `docker compose up`.
-- Exact commands get filled in here once PR 1 creates the app.
+- There is no Ruby on the host. Ruby 4.0 and Rails 8.1 run in docker compose (`compose.yml`, `Dockerfile.dev`). `Dockerfile` is the production image, used only by Kamal.
+- Start the app with `docker compose up -d` and open http://localhost:3000. The `web` service runs `bin/setup`, which installs gems into the `bundle` volume, prepares the database and starts the server.
+- Run commands with `docker compose exec web …` (e.g. `bin/rails console`, `bin/rails db:migrate`, `bin/rails generate …`).
+- After changing the Gemfile, run `docker compose restart web`. `bin/setup` re-runs `bundle install` on start.
+- For `debugger` breakpoints, run `docker compose attach web` (detach with Ctrl-P Ctrl-Q).
+- System tests run in the `chrome` service when `SELENIUM_HOST` is set (it is in compose). Without it, as in CI, they use local headless Chrome.
 
 ## Checks before opening a PR
-Run each of these through `docker compose exec web`:
-- `bin/rubocop`
-- `bin/brakeman`
-- `bin/rails test`
-- `bin/rails test:system`
+Run `docker compose exec web bin/ci`. It runs the steps in `config/ci.rb`, which cover everything GitHub Actions checks: RuboCop, the gem and importmap audits, Brakeman, unit and system tests, plus seeds. Fix every failure before opening the PR.
 
 There is no type checker.
 

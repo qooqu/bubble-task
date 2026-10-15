@@ -1,0 +1,31 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # Installs gems, prepares the database, then starts the server.
+    command: bin/setup
+    environment:
+      BINDING: 0.0.0.0
+      # Keep the pidfile on the tmpfs below so a killed server can't leave a stale one behind.
+      PIDFILE: /tmp/server.pid
+      SELENIUM_HOST: chrome
+    # Wiped on every container start; /tmp in the container layer would survive `docker compose restart`.
+    tmpfs: /tmp
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    # Lets `docker compose attach web` reach `debugger` breakpoints.
+    stdin_open: true
+    tty: true
+    depends_on:
+      - chrome
+
+  chrome:
+    image: selenium/standalone-chromium:155.0-20261010
+    shm_size: 2gb
+
+volumes:
+  bundle:
