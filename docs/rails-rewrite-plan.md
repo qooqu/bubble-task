@@ -149,7 +149,8 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Add `Dockerfile.dev` and `compose.yml` with the `web` and `chrome` services. In `ApplicationSystemTestCase`, use the remote `chrome` service when `SELENIUM_HOST` is set, and fall back to local headless Chrome when it isn't (as on the GitHub Actions runner).
 - Keep the generated `.github/workflows/ci.yml`, `Dockerfile` and `config/deploy.yml` as they are; `deploy.yml` gets filled in during PR 7.
 - **Check:** `docker compose up` serves the Rails welcome page, and `docker compose exec web bin/rails test test:system` runs green (empty test suite). CI runs green on the PR.
-- **After the first CI run:** add a GitHub ruleset on `rails-rewrite` (and later `main`) that requires the CI checks to pass before merging. Set it up with `gh api`; the checks have to have run once before they can be required.
+- **After the first CI run:** add a GitHub ruleset on `rails-rewrite` that requires the CI checks to pass before merging. Set it up with `gh api`; the checks have to have run once before they can be required. (Done: ruleset "Require CI on rails-rewrite".)
+- `ci.yml` sets `permissions: contents: read`, so CI stays read-only even if the repo's default token permissions change.
 
 ### PR 2: Authentication
 - Run `bin/rails generate authentication`, with `email_address` and `password_digest` nullable and a `guest` column (defaults to false) added now so PR 6 needs no further migration.
@@ -192,5 +193,6 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 
 ### Cutover (after PR 7)
 - Merge `rails-rewrite` into `main`.
+- Add `refs/heads/main` to the "Require CI on rails-rewrite" ruleset (or a copy of it), so `main` also requires the CI checks.
 - Turn off auto-deploy and shut down the Heroku app and the Netlify site.
 - Optional follow-up PR: Litestream backups.
