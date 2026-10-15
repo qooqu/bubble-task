@@ -18,7 +18,7 @@ The goal is a single Rails 8 app with these choices (all confirmed with the user
   `docker run --rm -v "$PWD":/rails -w /rails ruby:<current stable> sh -c "gem install rails && rails new . --name=bubbletask --database=sqlite3 --skip-action-mailbox --skip-action-text --skip-active-storage"` (Rails 8.x).
 - As the branch's first commit, delete the old code: `api/`, `web/`, the root `index.html` and `notes.md`. It stays readable on `main`, so the CSS, favicon and `Bubble.js` logic can be ported with `git show main:<path>`.
 - **Local dev runs in docker compose.** The generated `Dockerfile` stays production-only (Kamal uses it). Add separate dev files:
-  - `Dockerfile.dev`: the same `ruby` base image as the generated `Dockerfile`, plus `build-essential`, `libyaml-dev` and `sqlite3`. Runs a full `bundle install` that includes dev and test gems, and does no asset precompile.
+  - `Dockerfile.dev`: the same `ruby` slim base image as the generated `Dockerfile`, plus the packages needed to build gems and `sqlite3`. Gems aren't baked into the image: the `web` service runs `bin/setup`, which installs them (dev and test included) into the `bundle` volume, prepares the database and starts the server.
   - `compose.yml`:
     - **`web` service:**
       - builds `Dockerfile.dev`
@@ -26,11 +26,11 @@ The goal is a single Rails 8 app with these choices (all confirmed with the user
       - publishes port `3000:3000` and runs `bin/rails server -b 0.0.0.0`
       - sets `stdin_open: true` and `tty: true` so `docker compose attach web` reaches `debugger` breakpoints
       - SQLite files live in `storage/` on the bind mount (already gitignored)
-    - **`chrome` service:** the `selenium/standalone-chromium` image for system tests. `ApplicationSystemTestCase` points at it with `SELENIUM_HOST`, and Capybara serves on `0.0.0.0` with an app host the container can reach.
+    - **`chrome` service:** the `selenium/standalone-chromium` image (pinned tag) for system tests. When `SELENIUM_HOST` is set, `ApplicationSystemTestCase` drives that remote browser and uses `served_by host: "web"` so the browser can reach the test server.
 - Daily commands:
   - start the app: `docker compose up`
   - everything else: `docker compose exec web bin/rails …` (console, migrations, tests)
-  - after a Gemfile change: `docker compose exec web bundle install`, or `docker compose build`
+  - after a Gemfile change: `docker compose restart web` (`bin/setup` re-runs `bundle install`)
 
 ## Data model
 | table | columns | notes |
@@ -142,7 +142,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
   - **Checks before a PR:** `bin/rubocop`, `bin/brakeman`, `bin/rails test`, `bin/rails test:system`. There is no type checker.
   - **Conventions:** every lookup goes through `Current.user.*`, controller actions respond with `turbo_stream.replace "board"`, tests use Minitest with fixtures (no RSpec), and login is by email (no usernames).
 
-### PR 1: Remove old app, scaffold Rails with a Docker dev setup
+### PR 1: Remove old app, scaffold Rails with a Docker dev setup: done
 - Delete `api/`, `web/`, the root `index.html` and `notes.md`.
 - Update `CLAUDE.md` with the real commands now that the app exists, including the `Dockerfile.dev`/`compose.yml` workflow.
 - Run `rails new` in a throwaway container (see Setup).
