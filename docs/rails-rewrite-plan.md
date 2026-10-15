@@ -191,6 +191,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
   - the Mac's SSH agent, to reach the server. With Colima, start it with `colima start --ssh-agent` and mount the forwarded agent socket.
   - `KAMAL_REGISTRY_PASSWORD` passed through from the host environment
   - Hooks run inside this container, so they can only use tools the image has.
+- Add `/.claude`, `/docs`, `/CLAUDE.md` and `/compose.yml` to `.dockerignore`, so dev-only files stay out of the production image.
 - Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated) and `KAMAL_REGISTRY_PASSWORD` from the environment. No password manager integration: KeePass holds a backup of the master key only.
 - Kamal hooks in `.kamal/hooks/`:
   - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
