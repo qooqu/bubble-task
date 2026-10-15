@@ -23,7 +23,7 @@ If the user passed an argument (e.g. "PR 3"), build that one. Otherwise build th
    - Pass the range explicitly. After pushing, the branch has no commits ahead of its upstream, so a bare `/code-review` would find nothing to review.
    - The review runs in the background. Wait for its findings to arrive before doing anything else.
 
-6. **Check the fixes.** Look over the edits the review applied. Revert any that are wrong or out of scope. Re-run tests, linter and type checker.
+6. **Check the fixes.** Look over the edits the review applied. Revert any that are wrong or out of scope. Then check the whole PR diff against the "Code style" section of CLAUDE.md and fix any over-engineering or non-idiomatic code. Re-run tests, linter and type checker.
 
 7. **Push the fixes.** Commit them as a separate commit (e.g. "Address self-review findings") and push, so the human reviewer can see what the review changed.
 

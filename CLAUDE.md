@@ -37,6 +37,10 @@ There is no type checker.
 - Match the patterns already in this codebase over general best practices from elsewhere.
 - New gems need justification. Ask before adding one, unless `docs/rails-rewrite-plan.md` already names it (those are pre-approved).
 
+## When reviewing code
+- Flag over-engineering and non-idiomatic Rails (see Code style) as real issues, not nits.
+- Ignore anything CI already enforces (RuboCop, Brakeman, formatting).
+
 ## Conventions
 - Every record lookup goes through `Current.user.workers` or `Current.user.tasks`, never a bare `Worker.find` or `Task.find`.
 - Board actions respond with `turbo_stream.replace "board"`.
