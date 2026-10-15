@@ -17,6 +17,7 @@ A small task board: workers are columns, tasks are rows, and clicking a bubble a
 - Run commands with `docker compose exec web …` (e.g. `bin/rails console`, `bin/rails db:migrate`, `bin/rails generate …`).
 - After changing the Gemfile, run `docker compose restart web`. `bin/setup` re-runs `bundle install` on start.
 - For `debugger` breakpoints, run `docker compose attach web` (detach with Ctrl-P Ctrl-Q).
+- Mail sent in development is caught, not delivered. Read it at http://localhost:3000/letter_opener.
 - System tests run in the `chrome` service when `SELENIUM_HOST` is set (it is in compose). Without it, as in CI, they use local headless Chrome.
 
 ## Checks before opening a PR

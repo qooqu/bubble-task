@@ -1,0 +1,6 @@
+<h1>forgot your password?</h1>
+
+<%= form_with url: passwords_path do |form| %>
+  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "email", value: params[:email_address] %><br>
+  <%= form.submit "email reset instructions" %>
+<% end %>

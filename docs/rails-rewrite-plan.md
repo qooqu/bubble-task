@@ -152,7 +152,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - **After the first CI run:** add a GitHub ruleset on `rails-rewrite` that requires the CI checks to pass before merging. Set it up with `gh api`; the checks have to have run once before they can be required. (Done: ruleset "Require CI on rails-rewrite".)
 - `ci.yml` sets `permissions: contents: read`, so CI stays read-only even if the repo's default token permissions change.
 
-### PR 2: Authentication
+### PR 2: Authentication: done
 - Run `bin/rails generate authentication`, with `email_address` and `password_digest` nullable and a `guest` column (defaults to false) added now so PR 6 needs no further migration.
 - `RegistrationsController` for sign-up.
 - Keep the password-reset flow and add `letter_opener_web` at `/letter_opener`.
@@ -165,7 +165,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - **Tests:** model tests for every `click!` transition, worker deletion, and `reorder` scoping.
 
 ### PR 4: The board (no drag and drop yet)
-- `BoardsController#show` as `root`, with `_board.html.erb` (the table) and the two add forms.
+- Fill in `BoardsController#show` (PR 2 added it as `root` with a placeholder view), with `_board.html.erb` (the table) and the two add forms.
 - `WorkersController` and `TasksController` (`create`, `destroy`) and `Tasks::ProgressesController#update` (bubble clicks, calls `Task#click!`), all scoped through `Current.user`, all responding with `turbo_stream.replace "board"`.
 - Bubbles as `button_to` buttons.
 - Port the CSS, the Font Awesome link, the welcome text and the how-to list from `main`.
@@ -182,7 +182,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Signing up as a guest converts the guest account, keeping its data. Logging in abandons it.
 - `CleanupGuestsJob` in `config/recurring.yml`, deleting guests older than 7 days.
 - Nav and welcome text for guests.
-- **Tests:** an unauthenticated visit gets a seeded guest, guest-to-signup conversion keeps the data, and the cleanup job deletes only stale guests.
+- **Tests:** an unauthenticated visit gets a seeded guest, guest-to-signup conversion keeps the data, and the cleanup job deletes only stale guests. Call the job directly in tests: only production uses Solid Queue, so `recurring.yml` doesn't run in development or test.
 
 ### PR 7: Production deployment
 - Fill in `config/deploy.yml`: server, registry, `proxy` host/SSL, and the storage volume.
