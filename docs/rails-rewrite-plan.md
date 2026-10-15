@@ -70,14 +70,14 @@ Domain logic moves into the models:
 root "boards#show"
 resource  :session
 resource  :registration, only: %i[new create]
-resources :workers, only: %i[create destroy] do
-  patch :reorder, on: :collection
+resources :workers, only: %i[create destroy]
+resources :tasks,   only: %i[create destroy] do
+  resource :progress, only: :update, module: :tasks  # Tasks::ProgressesController, params: worker_id
 end
-resources :tasks, only: %i[create destroy] do
-  patch :click,   on: :member      # params: worker_id
-  patch :reorder, on: :collection  # params: ids[]
-end
+resource :worker_order, only: :update  # WorkerOrdersController, params: ids[]
+resource :task_order,   only: :update  # TaskOrdersController,   params: ids[]
 ```
+- Only standard RESTful actions. Clicking a bubble and reordering are their own resources rather than custom actions, as `CLAUDE.md` requires.
 - Every lookup goes through `Current.user.workers` or `Current.user.tasks`, which closes the owner-scoping hole.
 - Every action responds with a single `turbo_stream.replace "board"` that re-renders the grid partial. The grid is tiny, so finer-grained streams aren't worth the complexity.
 
@@ -88,10 +88,10 @@ end
   - two `form_with` add forms
   - `_board.html.erb` (the table), wrapped in `id="board"`
   - the how-to list
-- **Bubbles:** each bubble is a `button_to click_task_path(task, worker_id:)`, styled with the existing `bubble-00` … `bubble-100` and `bubble-na` classes.
+- **Bubbles:** each bubble is a `button_to task_progress_path(task, worker_id:), method: :patch`, styled with the existing `bubble-00` … `bubble-100` and `bubble-na` classes.
 - **Stimulus `sortable_controller`:**
   - ports the native HTML5 drag-and-drop from `Header.js` and `Trash.js`
-  - on a drop onto an item of the same kind, sends `PATCH reorder` with the new ID order
+  - on a drop onto an item of the same kind, sends `PATCH` to `worker_order_path` or `task_order_path` with the new ID order
   - on a drop onto the trash, sends `DELETE`
   - uses `@rails/request.js` (via importmap), which handles the CSRF token and applies Turbo Stream responses automatically
 - **Styles:** port `web/src/App.css` and `web/src/index.css` from `main` to `app/assets/stylesheets/`. Copy the Font Awesome `<link>` and the favicon from `web/public/` on `main`.
@@ -165,7 +165,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 
 ### PR 4: The board (no drag and drop yet)
 - `BoardsController#show` as `root`, with `_board.html.erb` (the table) and the two add forms.
-- `WorkersController` and `TasksController`: `create`, `destroy` and `click`, all scoped through `Current.user`, all responding with `turbo_stream.replace "board"`.
+- `WorkersController` and `TasksController` (`create`, `destroy`) and `Tasks::ProgressesController#update` (bubble clicks, calls `Task#click!`), all scoped through `Current.user`, all responding with `turbo_stream.replace "board"`.
 - Bubbles as `button_to` buttons.
 - Port the CSS, the Font Awesome link, the welcome text and the how-to list from `main`.
 - **Tests:** integration tests for owner scoping (user B's IDs return 404), and a system test that adds a worker and a task and clicks a bubble through its full cycle.
@@ -173,11 +173,11 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 ### PR 5: Drag-and-drop reorder and trash
 - Add `@rails/request.js` via importmap.
 - `sortable_controller` (Stimulus) for native HTML5 drag-and-drop on worker and task headers and the trash.
-- `reorder` collection routes and actions. Dropping onto the trash reuses `destroy`.
-- **Tests:** integration test for `reorder` (including foreign IDs being ignored), and a system test that reorders tasks and drags one to the trash.
+- `WorkerOrdersController#update` and `TaskOrdersController#update`, which call `reorder(ids)`. Dropping onto the trash reuses `destroy`.
+- **Tests:** integration tests for the two order controllers (including foreign IDs being ignored), and a system test that reorders tasks and drags one to the trash.
 
 ### PR 6: Guest sandbox
-- Lazily create a guest user for logged-out visitors to `/`, seeded with jack, jill, build and sell. Relax `require_authentication` on the board, worker and task routes to allow guests.
+- Lazily create a guest user for logged-out visitors to `/`, seeded with jack, jill, build and sell. Relax `require_authentication` on the board, worker, task, progress and order controllers to allow guests.
 - Signing up as a guest converts the guest account, keeping its data. Logging in abandons it.
 - `CleanupGuestsJob` in `config/recurring.yml`, deleting guests older than 7 days.
 - Nav and welcome text for guests.
