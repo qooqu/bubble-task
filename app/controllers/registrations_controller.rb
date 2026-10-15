@@ -11,7 +11,7 @@ class RegistrationsController < ApplicationController
 
     if @user.save
       start_new_session_for @user
-      redirect_to root_path, notice: "Welcome aboard."
+      redirect_to after_authentication_url, notice: "Welcome aboard."
     else
       render :new, status: :unprocessable_entity
     end

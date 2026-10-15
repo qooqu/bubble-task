@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
   root "boards#show"
 
-  resource :session
+  resource :session, only: %i[ new create destroy ]
   resource :registration, only: %i[ new create ]
-  resources :passwords, param: :token
+  resources :passwords, param: :token, only: %i[ new create edit update ]
 
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 

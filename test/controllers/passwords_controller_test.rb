@@ -26,6 +26,14 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_notice "reset instructions sent"
   end
 
+  test "create without an email address sends no mail, even to a guest" do
+    User.create!(guest: true)
+
+    post passwords_path
+    assert_enqueued_emails 0
+    assert_response :bad_request
+  end
+
   test "edit" do
     get edit_password_path(@user.password_reset_token)
     assert_response :success
@@ -57,7 +65,19 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     end
 
     follow_redirect!
-    assert_notice "Passwords did not match"
+    assert_notice "Password confirmation doesn't match Password"
+  end
+
+  test "update with a password longer than bcrypt allows" do
+    token = @user.password_reset_token
+    password = "😀" * 30
+    assert_no_changes -> { @user.reload.password_digest } do
+      put password_path(token), params: { password:, password_confirmation: password }
+      assert_redirected_to edit_password_path(token)
+    end
+
+    follow_redirect!
+    assert_notice "Password is too long"
   end
 
   private
