@@ -187,9 +187,13 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 ### PR 7: Production deployment
 - Fill in `config/deploy.yml`: server, registry, `proxy` host/SSL, and the storage volume.
 - Set up `.kamal/secrets`.
+- Kamal hooks in `.kamal/hooks/`:
+  - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
+  - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead (e.g. `gh run list --commit`), and abort unless it succeeded.
+  - **Delete the other samples.** They only print messages.
 - Production SMTP settings and `default_url_options`, with credentials in `config/credentials.yml.enc`.
 - Outside the repo (do before merging): provision the VPS, point DNS at it, verify the domain with the mail provider and add its records.
-- **Check:** `kamal setup` and `kamal deploy` succeed, the site loads over HTTPS, a real reset email arrives, and the guest cleanup job shows up in Solid Queue.
+- **Check:** `kamal setup` and `kamal deploy` succeed, `pre-build` blocks a deploy with uncommitted changes, `pre-deploy` blocks a commit whose CI failed or hasn't run, the site loads over HTTPS, a real reset email arrives, and the guest cleanup job shows up in Solid Queue.
 
 ### Cutover (after PR 7)
 - Merge `rails-rewrite` into `main`.
