@@ -194,7 +194,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated) and `KAMAL_REGISTRY_PASSWORD` from the environment. No password manager integration: KeePass holds a backup of the master key only.
 - Kamal hooks in `.kamal/hooks/`:
   - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
-  - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead, and abort unless it succeeded. `gh` isn't in the Kamal image, so call the GitHub API directly (e.g. `curl` with a `GITHUB_TOKEN` passed in).
+  - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead, and abort unless it succeeded. The Kamal image has neither `gh` nor `curl` (checked: v2.12.0), so keep the hook in Ruby like the sample and call the GitHub check-runs API with `Net::HTTP` and a `GITHUB_TOKEN` passed in.
   - **Delete the other samples.** They only print messages.
 - Production SMTP settings and `default_url_options`, with credentials in `config/credentials.yml.enc`.
 - Outside the repo (do before merging): provision the VPS, point DNS at it, verify the domain with the mail provider and add its records.
