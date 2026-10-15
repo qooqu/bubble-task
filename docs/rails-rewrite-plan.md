@@ -15,7 +15,7 @@ The goal is a single Rails 8 app with these choices (all confirmed with the user
 
 ## Setup
 - Branch `rails-rewrite`. Ruby isn't needed on the Mac, so generate the app from a throwaway container:
-  `docker run --rm -v "$PWD":/rails -w /rails ruby:<current stable> sh -c "gem install rails && rails new . --name=bubbletask --database=sqlite3 --skip-action-mailbox --skip-action-text --skip-active-storage"` (Rails 8.x).
+  `docker run --rm -v "$PWD":/rails -w /rails ruby:<current stable> sh -c "gem install rails && rails new . --name=bubble_task --database=sqlite3 --skip-action-mailbox --skip-action-text --skip-active-storage"` (Rails 8.x).
 - As the branch's first commit, delete the old code: `api/`, `web/`, the root `index.html` and `notes.md`. It stays readable on `main`, so the CSS, favicon and `Bubble.js` logic can be ported with `git show main:<path>`.
 - **Local dev runs in docker compose.** The generated `Dockerfile` stays production-only (Kamal uses it). Add separate dev files:
   - `Dockerfile.dev`: the same `ruby` slim base image as the generated `Dockerfile`, plus the packages needed to build gems and `sqlite3`. Gems aren't baked into the image: the `web` service runs `bin/setup`, which installs them (dev and test included) into the `bundle` volume, prepares the database and starts the server.
