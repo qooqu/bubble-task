@@ -17,8 +17,7 @@ docker compose attach web                   # reach a `debugger` breakpoint (det
 ## Tests and checks
 
 ```sh
-docker compose exec web bin/rails test
-docker compose exec web bin/rails test:system
-docker compose exec web bin/rubocop
-docker compose exec web bin/brakeman
+docker compose exec web bin/ci                 # everything GitHub Actions checks (steps in config/ci.rb)
+docker compose exec web bin/rails test         # just the unit tests
+docker compose exec web bin/rails test:system  # just the system tests
 ```

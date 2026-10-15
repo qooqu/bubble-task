@@ -124,7 +124,7 @@ Tests ship in the same PR as the code they cover. CI (the generated GitHub Actio
   - sign-up rejects a duplicate email (regardless of case) or an invalid one
   - password reset sends an email (`assert_emails`), and the token link sets a new password
 - **System test** (Capybara and Selenium): click a bubble through its full cycle, add a worker and a task, and drag one to the trash.
-- **Running tests:** `docker compose exec web bin/rails test` for model and integration tests, and `docker compose exec web bin/rails test:system` for system tests, which run against the `chrome` service.
+- **Running tests:** `docker compose exec web bin/ci` runs every check (the steps in `config/ci.rb`, matching GitHub Actions). For just the tests: `bin/rails test` for model and integration tests, and `bin/rails test:system` for system tests, which run against the `chrome` service.
 - **Manual:** run `docker compose up` and open http://localhost:3000. Go through the whole how-to list, request a password reset and check it at `/letter_opener`, and test a `debugger` breakpoint with `docker compose attach web`. Run `kamal deploy`, check HTTPS on the domain, and confirm a real reset email arrives.
 
 ## PR breakdown

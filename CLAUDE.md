@@ -20,11 +20,7 @@ A small task board: workers are columns, tasks are rows, and clicking a bubble a
 - System tests run in the `chrome` service when `SELENIUM_HOST` is set (it is in compose). Without it, as in CI, they use local headless Chrome.
 
 ## Checks before opening a PR
-Run each of these through `docker compose exec web`:
-- `bin/rubocop`
-- `bin/brakeman`
-- `bin/rails test`
-- `bin/rails test:system`
+Run `docker compose exec web bin/ci`. It runs the steps in `config/ci.rb`, which cover everything GitHub Actions checks: RuboCop, the gem and importmap audits, Brakeman, unit and system tests, plus seeds. Fix every failure before opening the PR.
 
 There is no type checker.
 
