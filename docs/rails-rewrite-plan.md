@@ -102,7 +102,7 @@ resource :task_order,   only: :update  # TaskOrdersController,   params: ids[]
   - server IP
   - image registry (GHCR or Docker Hub)
   - `proxy: { ssl: true, host: <domain> }`
-  - keep the generated `bubbletask_storage:/rails/storage` volume, which is where the SQLite files live
+  - keep the generated `bubble_task_storage:/rails/storage` volume, which is where the SQLite files live
 - Secrets: put `RAILS_MASTER_KEY` and `KAMAL_REGISTRY_PASSWORD` in `.kamal/secrets`. The SMTP credentials live in Rails credentials, which the master key unlocks.
 - Create an account with the mail provider, verify the sending domain and add its DNS records before the first deploy.
 - Leave `SOLID_QUEUE_IN_PUMA=true` (the default) so the cleanup job runs without a separate worker.
