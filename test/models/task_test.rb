@@ -6,7 +6,7 @@ class TaskTest < ActiveSupport::TestCase
 
     task.advance!(workers(:jack))
 
-    assert_equal workers(:jack), task.worker
+    assert_equal workers(:jack), task.reload.worker
     assert_equal 0, task.percent_complete
   end
 
@@ -51,6 +51,10 @@ class TaskTest < ActiveSupport::TestCase
     task.percent_complete = 30
 
     assert_not task.valid?
+  end
+
+  test "can't be assigned to another user's worker" do
+    assert_raises(ActiveRecord::RecordInvalid) { tasks(:plan).advance!(workers(:bob)) }
   end
 
   test "requires a name" do

@@ -11,7 +11,7 @@ module Positioned
     # (e.g. Current.user.tasks.reposition(ids)) so ids from other users are ignored.
     def reposition(ids)
       transaction do
-        ids.each.with_index { |id, position| where(id:).update_all(position:) }
+        ids.each_with_index { |id, position| where(id:).update_all(position:) }
       end
     end
   end

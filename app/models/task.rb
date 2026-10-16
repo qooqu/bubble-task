@@ -6,14 +6,15 @@ class Task < ApplicationRecord
 
   validates :name, presence: true
   validates :percent_complete, inclusion: { in: [ 0, 25, 50, 75, 100 ] }
+  validate :worker_has_same_user, if: :worker
 
   # One click on this task's bubble in worker's column: assigns an unassigned task to
   # worker, steps its progress by 25% per click, and unassigns it after 100%.
   # Bubbles in other workers' columns do nothing while the task is assigned.
   def advance!(worker)
-    return if self.worker && self.worker != worker
+    return if worker_id && worker_id != worker.id
 
-    if self.worker.nil?
+    if worker_id.nil?
       update!(worker:, percent_complete: 0)
     elsif percent_complete < 100
       update!(percent_complete: percent_complete + 25)
@@ -21,4 +22,9 @@ class Task < ApplicationRecord
       update!(worker: nil, percent_complete: 0)
     end
   end
+
+  private
+    def worker_has_same_user
+      errors.add(:worker, "must belong to the task's user") unless worker.user_id == user_id
+    end
 end
