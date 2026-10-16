@@ -32,7 +32,7 @@ class UserTest < ActiveSupport::TestCase
     user = User.new(email_address: "new@example.com", password: "secret", password_confirmation: "other")
 
     assert_not user.valid?
-    assert_includes user.errors[:password_confirmation], "doesn't match Password"
+    assert_includes user.errors[:password_confirmation], "doesn't match password"
   end
 
   test "rejects a password longer than bcrypt allows" do

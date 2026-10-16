@@ -22,7 +22,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "li", "Email address has already been taken"
+    assert_select "li", "email address has already been taken"
     assert_nil cookies[:session_id]
   end
 
@@ -32,7 +32,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "li", "Email address is invalid"
+    assert_select "li", "email address is invalid"
   end
 
   test "create with a password confirmation that doesn't match" do
