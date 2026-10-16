@@ -27,7 +27,9 @@ class BoardTest < ApplicationSystemTestCase
           bubble: b && { disabled: b.disabled, cls: b.className, formBusy: b.form && b.form.getAttribute("aria-busy"), html: b.form && b.form.outerHTML.slice(0, 400) },
           busy: Array.from(document.querySelectorAll("[aria-busy]")).map(e => e.tagName + "#" + e.id + "." + e.className),
           disabled: Array.from(document.querySelectorAll(":disabled")).map(e => e.tagName + " " + (e.getAttribute("aria-label") || e.name)),
-          ua: navigator.userAgent
+          ua: navigator.userAgent,
+          values: Array.from(document.querySelectorAll("input[type=text]")).map(e => e.name + "=" + JSON.stringify(e.value) + (e.validity.valid ? "" : " INVALID")),
+          forms: Array.from(document.querySelectorAll("form.add-form")).map(f => f.outerHTML.slice(0, 300))
         }
       })()
     JS
@@ -43,6 +45,7 @@ class BoardTest < ApplicationSystemTestCase
     assert_field "New worker name", with: ""
 
     fill_in "New task name", with: "Paint"
+    puts "=== DEBUG before enter: " + page.evaluate_script("document.querySelector('#task_name').value").inspect
     send_keys :enter
     assert_selector "#board tbody th", text: "Paint"
 
