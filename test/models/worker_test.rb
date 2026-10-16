@@ -16,6 +16,14 @@ class WorkerTest < ActiveSupport::TestCase
     assert_equal 0, tasks(:build).percent_complete
   end
 
+  test "deleting a worker updates its tasks' updated_at" do
+    travel 1.minute do
+      workers(:jack).destroy
+
+      assert_equal Time.current, tasks(:build).reload.updated_at
+    end
+  end
+
   test "deleting a worker leaves other workers' tasks alone" do
     workers(:jack).destroy
 

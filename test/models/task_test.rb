@@ -74,6 +74,14 @@ class TaskTest < ActiveSupport::TestCase
     assert_equal [ tasks(:plan), tasks(:build), tasks(:sell) ], users(:one).tasks.to_a
   end
 
+  test "reposition updates updated_at" do
+    travel 1.minute do
+      users(:one).tasks.reposition([ tasks(:sell).id, tasks(:build).id ])
+
+      assert_equal Time.current, tasks(:sell).reload.updated_at
+    end
+  end
+
   test "reposition through an association ignores other users' tasks" do
     assert_no_changes -> { tasks(:ship).reload.position } do
       users(:one).tasks.reposition([ tasks(:sell).id, tasks(:ship).id ])

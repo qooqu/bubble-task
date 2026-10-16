@@ -7,5 +7,5 @@ class Worker < ApplicationRecord
   validates :name, presence: true
 
   # Tasks assigned to a deleted worker go back to unassigned, with their progress reset.
-  before_destroy { tasks.update_all(worker_id: nil, percent_complete: 0) }
+  before_destroy { tasks.update_all(worker_id: nil, percent_complete: 0, updated_at: Time.current) }
 end
