@@ -35,9 +35,11 @@
       </ul>
     </nav>
 
-    <%= tag.div(flash[:alert], class: "alert") if flash[:alert] %>
-    <%= tag.div(flash[:notice], class: "notice") if flash[:notice] %>
+    <main>
+      <%= tag.div(flash[:alert], class: "alert") if flash[:alert] %>
+      <%= tag.div(flash[:notice], class: "notice") if flash[:notice] %>
 
-    <%= yield %>
+      <%= yield %>
+    </main>
   </body>
 </html>

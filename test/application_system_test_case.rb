@@ -1,5 +1,8 @@
 require "test_helper"
 
+# Let finders match fields and buttons by their aria-label, as screen readers do.
+Capybara.enable_aria_label = true
+
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   if ENV["SELENIUM_HOST"]
     # In docker compose: the browser runs in the chrome service and reaches the app at the web service.
