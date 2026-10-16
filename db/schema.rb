@@ -28,7 +28,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_204010) do
     t.integer "percent_complete", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_tasks_on_user_id"
+    t.index ["user_id", "position"], name: "index_tasks_on_user_id_and_position"
     t.index ["worker_id"], name: "index_tasks_on_worker_id"
   end
 
@@ -47,7 +47,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_204010) do
     t.integer "position", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_workers_on_user_id"
+    t.index ["user_id", "position"], name: "index_workers_on_user_id_and_position"
   end
 
   add_foreign_key "sessions", "users"
