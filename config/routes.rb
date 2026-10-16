@@ -5,6 +5,11 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   resources :passwords, param: :token, only: %i[ new create edit update ]
 
+  resources :workers, only: :create
+  resources :tasks, only: :create do
+    resource :progress, only: :update, module: :tasks
+  end
+
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
