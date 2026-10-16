@@ -22,9 +22,17 @@ class BoardTest < ApplicationSystemTestCase
     bubble = -> { find_button("Paint, Ann") }
     assert_includes bubble.call[:class], "bubble-na"
 
-    %w[ bubble-00 bubble-25 bubble-50 bubble-75 bubble-100 bubble-na ].each do |expected|
-      bubble.call.click
-      assert_selector "button.#{expected}[aria-label='Paint, Ann']"
+    begin
+      %w[ bubble-00 bubble-25 bubble-50 bubble-75 bubble-100 bubble-na ].each do |expected|
+        bubble.call.click
+        assert_selector "button.#{expected}[aria-label='Paint, Ann']"
+      end
+    rescue Minitest::Assertion
+      puts "=== DEBUG test.log tail"
+      puts File.readlines("log/test.log").last(60).grep_v(/^\s*$/).join
+      puts "=== DEBUG board html"
+      puts find("#board")["outerHTML"][0, 3000]
+      raise
     end
   end
 end
