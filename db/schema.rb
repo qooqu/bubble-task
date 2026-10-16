@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_234456) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_204010) do
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -18,6 +18,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_234456) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "worker_id"
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.integer "percent_complete", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "position"], name: "index_tasks_on_user_id_and_position"
+    t.index ["worker_id"], name: "index_tasks_on_worker_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -29,5 +41,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_234456) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  create_table "workers", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "position"], name: "index_workers_on_user_id_and_position"
+  end
+
   add_foreign_key "sessions", "users"
+  add_foreign_key "tasks", "users"
+  add_foreign_key "tasks", "workers"
+  add_foreign_key "workers", "users"
 end
