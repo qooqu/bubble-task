@@ -1,0 +1,14 @@
+jack:
+  user: one
+  name: Jack
+  position: 0
+
+jill:
+  user: one
+  name: Jill
+  position: 1
+
+bob:
+  user: two
+  name: Bob
+  position: 0

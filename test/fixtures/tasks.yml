@@ -1,0 +1,25 @@
+build:
+  user: one
+  name: Build
+  position: 0
+  worker: jack
+  percent_complete: 25
+
+sell:
+  user: one
+  name: Sell
+  position: 1
+  worker: jill
+  percent_complete: 0
+
+plan:
+  user: one
+  name: Plan
+  position: 2
+
+ship:
+  user: two
+  name: Ship
+  position: 0
+  worker: bob
+  percent_complete: 50

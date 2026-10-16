@@ -47,4 +47,12 @@ class UserTest < ActiveSupport::TestCase
 
     assert user.update(email_address: "changed@example.com")
   end
+
+  test "deleting a user deletes their workers and tasks" do
+    user = users(:one)
+
+    assert_difference -> { Worker.count } => -2, -> { Task.count } => -3 do
+      user.destroy
+    end
+  end
 end
