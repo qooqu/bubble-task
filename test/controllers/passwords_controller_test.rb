@@ -27,7 +27,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create without an email address sends no mail, even to a guest" do
-    User.create!(guest: true)
+    User.create!(guest: true, password: SecureRandom.base58(24))
 
     post passwords_path
     assert_enqueued_emails 0
