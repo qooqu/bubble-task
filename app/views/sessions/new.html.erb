@@ -1,9 +1,9 @@
-<h1>log in</h1>
+<h1>Log in</h1>
 
 <%= form_with url: session_path do |form| %>
-  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "email", value: params[:email_address] %><br>
-  <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "password", maxlength: 72 %><br>
-  <%= form.submit "log in" %>
+  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email", value: params[:email_address] %><br>
+  <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Password", maxlength: 72 %><br>
+  <%= form.submit "Log in" %>
 <% end %>
 
-<%= link_to "forgot your password?", new_password_path %>
+<%= link_to "Forgot your password?", new_password_path %>

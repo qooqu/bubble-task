@@ -23,14 +23,14 @@
 
   <body>
     <nav>
-      <%= link_to "bubble task", root_path %>
+      <%= link_to "Bubble Task", root_path %>
       <ul>
         <% if authenticated? %>
           <li><%= Current.user.email_address %></li>
-          <li><%= button_to "log out", session_path, method: :delete %></li>
+          <li><%= button_to "Log out", session_path, method: :delete %></li>
         <% else %>
-          <li><%= link_to "sign up", new_registration_path %></li>
-          <li><%= link_to "log in", new_session_path %></li>
+          <li><%= link_to "Sign up", new_registration_path %></li>
+          <li><%= link_to "Log in", new_session_path %></li>
         <% end %>
       </ul>
     </nav>

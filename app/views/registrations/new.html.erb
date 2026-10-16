@@ -1,4 +1,4 @@
-<h1>sign up</h1>
+<h1>Sign up</h1>
 
 <%= form_with model: @user, url: registration_path do |form| %>
   <% if @user.errors.any? %>
@@ -9,8 +9,8 @@
     </ul>
   <% end %>
 
-  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "email" %><br>
-  <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "password", maxlength: 72 %><br>
-  <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "repeat password", maxlength: 72 %><br>
-  <%= form.submit "sign up" %>
+  <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email" %><br>
+  <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Password", maxlength: 72 %><br>
+  <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat password", maxlength: 72 %><br>
+  <%= form.submit "Sign up" %>
 <% end %>

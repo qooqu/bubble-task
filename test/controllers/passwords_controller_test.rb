@@ -54,7 +54,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     end
 
     follow_redirect!
-    assert_notice "your password has been reset"
+    assert_notice "Your password has been reset"
   end
 
   test "update with non matching passwords" do
@@ -65,7 +65,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     end
 
     follow_redirect!
-    assert_notice "password confirmation doesn't match password"
+    assert_notice "Password confirmation doesn't match Password"
   end
 
   test "update with a password longer than bcrypt allows" do
@@ -77,7 +77,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     end
 
     follow_redirect!
-    assert_notice "password is too long"
+    assert_notice "Password is too long"
   end
 
   private

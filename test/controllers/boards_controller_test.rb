@@ -13,6 +13,6 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "nav", /#{users(:one).email_address}/
-    assert_select "nav button", "log out"
+    assert_select "nav button", "Log out"
   end
 end
