@@ -33,12 +33,23 @@ class BoardTest < ApplicationSystemTestCase
         }
       })()
     JS
+    puts "=== DEBUG events:\n" + page.evaluate_script("window.__log ? window.__log.join('\\n') : 'no log (page reloaded?)'")
     puts "=== DEBUG browser log: " + (page.driver.browser.logs.get(:browser).map(&:message).join(" | ") rescue "n/a")
     puts File.readlines("log/test.log").grep(/Started|Completed|Error|error/).last(40).join
     raise
   end
 
   def run_steps
+    page.execute_script(<<~JS)
+      window.__log = []
+      const t0 = performance.now()
+      for (const type of ["reset", "submit", "turbo:submit-start", "turbo:submit-end", "turbo:before-fetch-response", "turbo:before-stream-render", "turbo:visit", "turbo:before-render", "turbo:render", "turbo:load", "input", "keydown"]) {
+        document.addEventListener(type, e => {
+          const t = e.target
+          window.__log.push(Math.round(performance.now() - t0) + "ms " + type + " " + (t.id || t.action || t.tagName) + (t.value !== undefined && t.tagName == "INPUT" ? "=" + JSON.stringify(t.value) : ""))
+        }, true)
+      }
+    JS
     fill_in "New worker name", with: "Ann"
     send_keys :enter
     assert_selector "#board thead th", text: "Ann"
