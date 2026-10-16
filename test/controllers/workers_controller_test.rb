@@ -14,12 +14,12 @@ class WorkersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "create with a blank name adds nothing" do
+  test "create with a blank name adds nothing and fails, so the form keeps its text" do
     assert_no_difference -> { Worker.count } do
-      post workers_path, params: { worker: { name: "" } }, as: :turbo_stream
+      post workers_path, params: { worker: { name: "  " } }, as: :turbo_stream
     end
 
-    assert_turbo_stream action: :replace, target: "board"
+    assert_response :unprocessable_content
   end
 
   test "create requires logging in" do

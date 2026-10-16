@@ -16,9 +16,11 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "create with a blank name adds nothing" do
+  test "create with a blank name adds nothing and fails, so the form keeps its text" do
     assert_no_difference -> { Task.count } do
-      post tasks_path, params: { task: { name: "" } }, as: :turbo_stream
+      post tasks_path, params: { task: { name: "  " } }, as: :turbo_stream
     end
+
+    assert_response :unprocessable_content
   end
 end
