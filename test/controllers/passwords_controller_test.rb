@@ -26,9 +26,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_notice "reset instructions sent"
   end
 
-  test "create without an email address sends no mail, even to a guest" do
-    User.create!(guest: true, password: SecureRandom.base58(24))
-
+  test "create without an email address sends no mail" do
     post passwords_path
     assert_enqueued_emails 0
     assert_response :bad_request

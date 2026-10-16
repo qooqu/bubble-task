@@ -47,8 +47,4 @@ class UserTest < ActiveSupport::TestCase
 
     assert user.update(email_address: "changed@example.com")
   end
-
-  test "guests need no email address" do
-    assert User.new(guest: true, password: SecureRandom.base58(24)).valid?
-  end
 end

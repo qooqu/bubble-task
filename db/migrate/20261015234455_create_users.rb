@@ -1,8 +1,7 @@
 class CreateUsers < ActiveRecord::Migration[8.1]
   def change
     create_table :users do |t|
-      # Nullable for guest users, who have no email address; the model requires one for everyone else.
-      t.string :email_address
+      t.string :email_address, null: false
       t.string :password_digest, null: false
       t.boolean :guest, null: false, default: false
 
