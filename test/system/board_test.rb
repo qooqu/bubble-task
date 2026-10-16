@@ -17,6 +17,21 @@ class BoardTest < ApplicationSystemTestCase
     puts File.readlines("log/test.log").grep(/Started|Completed/).last(40).join
   rescue Minitest::Assertion
     puts "=== DEBUG failed after #{(Time.now - started).round(2)}s"
+    puts "=== DEBUG browser: " + page.evaluate_script(<<~JS).inspect
+      (() => {
+        const b = document.querySelector("button[aria-label='Paint, Ann']")
+        return {
+          turbo: !!window.Turbo,
+          stimulus: !!window.Stimulus,
+          active: document.activeElement && document.activeElement.outerHTML.slice(0, 120),
+          bubble: b && { disabled: b.disabled, cls: b.className, formBusy: b.form && b.form.getAttribute("aria-busy"), html: b.form && b.form.outerHTML.slice(0, 400) },
+          busy: Array.from(document.querySelectorAll("[aria-busy]")).map(e => e.tagName + "#" + e.id + "." + e.className),
+          disabled: Array.from(document.querySelectorAll(":disabled")).map(e => e.tagName + " " + (e.getAttribute("aria-label") || e.name)),
+          ua: navigator.userAgent
+        }
+      })()
+    JS
+    puts "=== DEBUG browser log: " + (page.driver.browser.logs.get(:browser).map(&:message).join(" | ") rescue "n/a")
     puts File.readlines("log/test.log").grep(/Started|Completed|Error|error/).last(40).join
     raise
   end
