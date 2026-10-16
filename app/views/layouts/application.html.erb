@@ -14,9 +14,7 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/favicon.ico" sizes="any">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
@@ -24,6 +22,22 @@
   </head>
 
   <body>
+    <nav>
+      <%= link_to "Bubble Task", root_path %>
+      <ul>
+        <% if authenticated? %>
+          <li><%= Current.user.email_address %></li>
+          <li><%= button_to "Log out", session_path, method: :delete %></li>
+        <% else %>
+          <li><%= link_to "Sign up", new_registration_path %></li>
+          <li><%= link_to "Log in", new_session_path %></li>
+        <% end %>
+      </ul>
+    </nav>
+
+    <%= tag.div(flash[:alert], class: "alert") if flash[:alert] %>
+    <%= tag.div(flash[:notice], class: "notice") if flash[:notice] %>
+
     <%= yield %>
   </body>
 </html>
