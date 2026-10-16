@@ -65,7 +65,7 @@ Domain logic moves into the models:
 - **`User.create_guest!`** (a class method, not a callback) creates the guest with a placeholder email (`guest-#{SecureRandom.hex(8)}@guest.invalid`; `.invalid` is a reserved domain that can never receive mail) and a random password (`SecureRandom.base58(24)`), and seeds the old demo data (workers Jack and Jill, tasks Build and Sell) in one transaction. The controller then starts a normal session.
 - **Signing up while a guest converts that guest:** it replaces both placeholders with the email and password they enter, and sets `guest: false`, so sandbox work is kept. This is an improvement over the old app, which lost it.
 - **Logging in while a guest abandons the guest record.**
-- **Guests' placeholder emails stay out of sight:** the nav shows "Guest" instead, and password reset skips guests (`unless user.guest?`), so no mail is ever sent to a `.invalid` address. Anything that later lists or emails users must filter with `where(guest: false)`.
+- **Guests' placeholder emails stay out of sight:** the nav shows "Guest" instead, and password reset skips guests (`unless user.guest?`), so no mail is ever sent to a `.invalid` address. Anything that later lists or emails users must leave guests out: add a `registered` scope (`where(guest: false)`) with the first query that needs it, not before.
 - A Solid Queue recurring job (`config/recurring.yml`) deletes guest users older than 7 days, along with their dependent records. Since guests only exist when someone clicks "Try it out", this is routine tidying.
 
 ## Routes and controllers
@@ -186,7 +186,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - `GuestsController#create` (`resource :guest, only: :create`, `allow_unauthenticated_access`), plus a "Try it out" `button_to` on the log-in page. Guests have normal sessions, so no other controller needs changes.
 - Signing up as a guest converts the guest account, replacing the placeholder email and password with the ones entered and keeping its data. Logging in abandons it.
 - Signing up while logged in as a real (non-guest) user currently starts a second session and leaves the first open. Redirect those users away from sign-up instead.
-- `CleanupGuestsJob` in `config/recurring.yml`, deleting guests older than 7 days.
+- `scope :guests, -> { where(guest: true) }` on `User`, and `CleanupGuestsJob` in `config/recurring.yml`, deleting `User.guests.where(created_at: ...7.days.ago)`.
 - Nav shows "Guest" (not the placeholder email) and welcome text for guests.
 - Password reset skips guests, so nothing is mailed to a `.invalid` address.
 - **Tests:** "Try it out" creates a seeded, logged-in guest; a logged-out GET of `/` creates no user; guest-to-signup conversion keeps the data and replaces the placeholder email and password (the user can log in with the new password), a reset request for a guest's address sends no mail, and the cleanup job deletes only stale guests. Call the job directly in tests: only production uses Solid Queue, so `recurring.yml` doesn't run in development or test.
