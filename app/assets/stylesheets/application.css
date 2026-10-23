@@ -1,10 +1,164 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+/* Ported from the old React app (web/src/index.css and App.css on main). */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Nav */
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 1vw;
+  background: orange;
+}
+
+nav > a {
+  padding: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+nav ul {
+  display: inline;
+  list-style-type: none;
+}
+
+nav li {
+  display: inline-block;
+  margin-left: 1rem;
+}
+
+/* Page */
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60vw;
+}
+
+main > * {
+  margin: 2vh;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+button,
+input[type="submit"] {
+  padding: 0.5rem;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 15rem;
+  margin: 0.25rem 1vw 0.25rem 0;
+  border-bottom: 1px solid black;
+}
+
+.alert {
+  color: red;
+}
+
+.notice {
+  color: green;
+}
+
+/* Board */
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px 15px;
+  border: 1px solid #cecfd5;
+  vertical-align: middle;
+}
+
+.bubble {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.bubble:hover {
+  background-color: white;
+}
+
+.bubble-na {
+  border: 2px solid grey;
+  background-color: white;
+}
+
+.bubble-00 {
+  border: 2px solid black;
+  background-image: radial-gradient(circle, black 0%, white 0%);
+}
+
+.bubble-25 {
+  border: 2px solid black;
+  background-image: radial-gradient(circle, black 25%, white 25%);
+}
+
+.bubble-50 {
+  border: 2px solid black;
+  background-image: radial-gradient(circle, black 42%, white 42%);
+}
+
+.bubble-75 {
+  border: 2px solid black;
+  background-image: radial-gradient(circle, black 53%, white 53%);
+}
+
+.bubble-100 {
+  border: 2px solid black;
+  background-image: radial-gradient(circle, black 100%, white 0%);
+}
+
+#howto {
+  list-style-type: none;
+}
+
+#howto li::before {
+  content: "-";
+  position: absolute;
+  margin-left: -1em;
+}
+
+@media (max-width: 30em) {
+  nav {
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  main {
+    width: 95vw;
+  }
+}

@@ -5,6 +5,15 @@ class WorkerTest < ActiveSupport::TestCase
     assert_not Worker.new(user: users(:one)).valid?
   end
 
+  test "strips surrounding whitespace from the name" do
+    assert_equal "Celebrate", Worker.new(name: "  Celebrate  ").name
+  end
+
+  test "name can be at most 50 characters" do
+    assert Worker.new(user: users(:one), name: "a" * 50).valid?
+    assert_not Worker.new(user: users(:one), name: "a" * 51).valid?
+  end
+
   test "new workers go to the end of their user's list" do
     assert_equal 2, users(:one).workers.create!(name: "Pat").position
   end

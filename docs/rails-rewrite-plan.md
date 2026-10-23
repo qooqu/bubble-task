@@ -171,15 +171,20 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - `Task#advance!(worker)`, the Worker `before_destroy` unassign/reset, and the `Positioned` concern (`reposition(ids)`, append on create).
 - **Tests:** model tests for every `advance!` transition, worker deletion, `reposition` scoping, and new records going to the end.
 
-### PR 4: The board (no drag and drop yet)
+### PR 4: The board (no drag and drop yet): done
 - Fill in `BoardsController#show` (PR 2 added it as `root` with a placeholder view), with `_board.html.erb` (the table) and the two add forms.
-- `WorkersController` and `TasksController` (`create`, `destroy`) and `Tasks::ProgressesController#update` (bubble clicks, calls `Task#advance!`), all scoped through `Current.user`, all responding with `turbo_stream.replace "board"`.
+- `WorkersController#create`, `TasksController#create` and `Tasks::ProgressesController#update` (bubble clicks, calls `Task#advance!`), all scoped through `Current.user`, all responding with `turbo_stream.replace "board"` via a small `BoardRendering` concern. `destroy` moved to PR 5, where its only UI (the trash) arrives.
+- A `reset-form` Stimulus controller clears an add form after it submits, keeping focus there for the next entry.
 - Bubbles as `button_to` buttons.
-- Port the CSS, the Font Awesome link, the welcome text and the how-to list from `main`.
+- Worker and task names are stripped (`normalizes`) and capped at 50 characters, with a matching `maxlength` on the add forms.
+- Port the CSS and the click-related how-to lines from `main`. The Font Awesome link (only used for the trash icon) moved to PR 5, and the guest welcome text to PR 6.
 - **Tests:** integration tests for owner scoping (user B's IDs return 404), and a system test that adds a worker and a task and clicks a bubble through its full cycle.
 
 ### PR 5: Drag-and-drop reorder and trash
 - Add `@rails/request.js` via importmap.
+- `WorkersController#destroy` and `TasksController#destroy` (moved here from PR 4), scoped through `Current.user`, responding with the board.
+- The trash icon: the old app used Font Awesome 4.7 (`fa-trash-o`) from cdnjs for it. An inline SVG avoids an external stylesheet for one icon.
+- Add the drag-and-drop lines to the how-to list ("Drag and drop tasks and workers to reorder.", "You can also drag them to the trash.").
 - `sortable_controller` (Stimulus) for native HTML5 drag-and-drop on worker and task headers and the trash.
 - `WorkerOrdersController#update` and `TaskOrdersController#update`, which call `Current.user.workers.reposition(ids)` / `Current.user.tasks.reposition(ids)`. Dropping onto the trash reuses `destroy`.
 - **Tests:** integration tests for the two order controllers (including foreign IDs being ignored), and a system test that reorders tasks and drags one to the trash.
@@ -190,7 +195,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Signing up as a guest converts the guest account, replacing the placeholder email and password with the ones entered and keeping its data. Logging in abandons it.
 - Signing up while logged in as a real (non-guest) user currently starts a second session and leaves the first open. Redirect those users away from sign-up instead.
 - `scope :guests, -> { where(guest: true) }` on `User`, and `CleanupGuestsJob` in `config/recurring.yml`, deleting `User.guests.where(created_at: ...7.days.ago)`.
-- Nav shows "Guest" (not the placeholder email) and welcome text for guests.
+- Nav shows "Guest" (not the placeholder email), and the board shows the old app's welcome text for guests ("Welcome to Bubble Task! Try it out in the sandbox below. Sign up to save your work.").
 - Password reset skips guests, so nothing is mailed to a `.invalid` address.
 - **Tests:** "Try it out" creates a seeded, logged-in guest; a logged-out GET of `/` creates no user; guest-to-signup conversion keeps the data and replaces the placeholder email and password (the user can log in with the new password), a reset request for a guest's address sends no mail, and the cleanup job deletes only stale guests. Call the job directly in tests: only production uses Solid Queue, so `recurring.yml` doesn't run in development or test.
 
