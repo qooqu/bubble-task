@@ -20,8 +20,9 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
+# TierHive's HAProxy terminates SSL and forwards plain HTTP to port 80.
 proxy:
-  ssl: true
+  ssl: false
   host: bubbletask.greenwold.com
 
 # Where you keep your container images.
