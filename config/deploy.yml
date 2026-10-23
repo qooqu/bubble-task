@@ -7,7 +7,7 @@ image: bubble_task
 # Deploy to these servers.
 servers:
   web:
-    - 192.0.2.1 # TODO: the VPS's IP address
+    - 207.241.173.35
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -90,9 +90,9 @@ builder:
   #   - GITHUB_TOKEN
   #   - RAILS_MASTER_KEY
 
-# Use a different ssh user than root
-# ssh:
-#   user: app
+# TierHive's NAT forwards this port to the VPS's SSH port.
+ssh:
+  port: 3768
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:
