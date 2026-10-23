@@ -22,6 +22,27 @@ class WorkersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test "destroy deletes the worker, unassigns its tasks and re-renders the board" do
+    assert_difference -> { users(:one).workers.count }, -1 do
+      delete worker_path(workers(:jack)), as: :turbo_stream
+    end
+
+    assert_nil tasks(:build).reload.worker
+    assert_turbo_stream action: :replace, target: "board" do
+      assert_select "thead th[scope=col]" do |headers|
+        assert_equal %w[ Jill ], headers.map(&:text)
+      end
+    end
+  end
+
+  test "destroy can't touch another user's worker" do
+    assert_no_difference -> { Worker.count } do
+      delete worker_path(workers(:bob)), as: :turbo_stream
+    end
+
+    assert_response :not_found
+  end
+
   test "create requires logging in" do
     sign_out
 

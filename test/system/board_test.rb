@@ -27,4 +27,17 @@ class BoardTest < ApplicationSystemTestCase
       assert_selector "button.#{expected}[aria-label='Paint, Ann']"
     end
   end
+
+  test "dragging a task onto another to reorder, and onto the trash to delete it" do
+    fill_in "New task name", with: "Paint"
+    send_keys :enter
+    assert_selector "#board tbody th", text: "Paint"
+
+    find("#board tbody th", text: "Paint").drag_to find("#board tbody th", text: "Ship")
+    assert_selector "#board tbody tr:first-child th", text: "Paint"
+
+    find("#board tbody th", text: "Ship").drag_to find("#board [aria-label=Trash]")
+    assert_no_selector "#board tbody th", text: "Ship"
+    assert_selector "#board tbody th", text: "Paint"
+  end
 end

@@ -10,4 +10,9 @@ class WorkersController < ApplicationController
       head :unprocessable_content
     end
   end
+
+  def destroy
+    Current.user.workers.find(params[:id]).destroy!
+    render_board
+  end
 end

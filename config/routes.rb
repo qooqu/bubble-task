@@ -5,10 +5,12 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   resources :passwords, param: :token, only: %i[ new create edit update ]
 
-  resources :workers, only: :create
-  resources :tasks, only: :create do
+  resources :workers, only: %i[ create destroy ]
+  resources :tasks, only: %i[ create destroy ] do
     resource :progress, only: :update, module: :tasks
   end
+  resource :worker_order, only: :update
+  resource :task_order, only: :update
 
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
