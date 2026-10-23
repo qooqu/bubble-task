@@ -8,9 +8,10 @@ class RegistrationsController < ApplicationController
   end
 
   # A guest who signs up keeps their account and its board, with the placeholder
-  # email and password replaced by the ones entered.
+  # email and password replaced by the ones entered. The guest is loaded afresh so
+  # a failed save doesn't leave Current.user (and the nav) showing unsaved changes.
   def create
-    @user = Current.user || User.new
+    @user = Current.user ? User.guests.find(Current.user.id) : User.new
     @user.assign_attributes(registration_params.merge(guest: false))
 
     if @user.save

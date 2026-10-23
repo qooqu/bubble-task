@@ -71,6 +71,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     post registration_path, params: { user: { email_address: users(:one).email_address, password: "secret", password_confirmation: "secret" } }
 
     assert_response :unprocessable_entity
+    assert_select "nav", /Guest/
+    assert_select "nav button", { text: "Log out", count: 0 }
     assert guest.reload.guest?
     assert_match(/guest\.invalid\z/, guest.email_address)
   end
