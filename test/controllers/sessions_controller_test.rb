@@ -51,4 +51,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert_empty cookies[:session_id]
   end
+
+  test "create as a guest logs in to the registered account instead" do
+    post guest_path
+    post session_path, params: { email_address: @user.email_address, password: "password" }
+    follow_redirect!
+
+    assert_select "nav", /#{@user.email_address}/
+  end
 end

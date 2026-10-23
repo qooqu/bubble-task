@@ -26,6 +26,12 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_notice "reset instructions sent"
   end
 
+  test "create for a guest sends no mail" do
+    post passwords_path, params: { email_address: User.create_guest!.email_address }
+    assert_enqueued_emails 0
+    assert_redirected_to new_session_path
+  end
+
   test "create without an email address sends no mail" do
     post passwords_path
     assert_enqueued_emails 0

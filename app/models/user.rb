@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  GUEST_LIFETIME = 24.hours
+
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :tasks, -> { order(:position) }, dependent: :delete_all
@@ -7,4 +9,26 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  # A guest never sees their random password, so signing up has to replace it.
+  validates :password, presence: true, if: -> { guest_changed?(from: true, to: false) }
+
+  scope :guests, -> { where(guest: true) }
+
+  # A sandbox account for "Try it out", seeded with a demo board. The
+  # .invalid address can never receive mail, and the password is never shown.
+  def self.create_guest!
+    transaction do
+      create!(guest: true, email_address: "guest-#{SecureRandom.hex(8)}@guest.invalid", password: SecureRandom.base58(24)).tap do |user|
+        jack, jill = user.workers.create!([ { name: "Jack" }, { name: "Jill" } ])
+        user.tasks.create!(name: "Build", worker: jack, percent_complete: 25)
+        user.tasks.create!(name: "Sell", worker: jill, percent_complete: 75)
+      end
+    end
+  end
+
+  # When CleanupGuestsJob deletes this guest and their board: the first hour
+  # after GUEST_LIFETIME is up.
+  def deletion_time
+    (created_at + GUEST_LIFETIME).beginning_of_hour + 1.hour
+  end
 end
