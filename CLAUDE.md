@@ -17,7 +17,7 @@ A small task board: workers are columns, tasks are rows, and clicking a bubble a
 - Run commands with `docker compose exec web …` (e.g. `bin/rails console`, `bin/rails db:migrate`, `bin/rails generate …`).
 - After changing the Gemfile, run `docker compose restart web`. `bin/setup` re-runs `bundle install` on start.
 - Edit credentials with `docker compose exec -e EDITOR=nano web bin/rails credentials:edit`.
-- Deploy with `bin/kamal deploy`. It runs Kamal from its Docker image and needs `GITHUB_TOKEN` in the environment for the `pre-deploy` CI check. Images go through Kamal's local registry (`localhost:5555`) over SSH, so there's no hosted registry or registry password.
+- Deploy with `bin/kamal deploy`. It runs Kamal from its Docker image and needs `GITHUB_TOKEN` in the environment for the `pre-deploy` CI check. Until cutover, deploy from a PR branch whose CI passed: merge commits on `rails-rewrite` get no CI, so `pre-deploy` blocks them. Images go through Kamal's local registry (`localhost:5555`) over SSH, so there's no hosted registry or registry password.
 - For `debugger` breakpoints, run `docker compose attach web` (detach with Ctrl-P Ctrl-Q).
 - Mail sent in development is caught, not delivered. Read it at http://localhost:3000/letter_opener.
 - System tests run in the `chrome` service when `SELENIUM_HOST` is set (it is in compose). Without it, as in CI, they use local headless Chrome.
