@@ -1,0 +1,33 @@
+<table id="board" data-controller="sortable">
+  <thead>
+    <tr>
+      <th data-action="dragover->sortable#allowTrash drop->sortable#trash">
+        <svg class="trash" viewBox="0 0 24 24" role="img" aria-label="Trash">
+          <path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 11v6M14 11v6" />
+        </svg>
+      </th>
+      <% workers.each do |worker| %>
+        <th scope="col" draggable="true" class="grabbable"
+            data-sortable-target="item" data-group="workers" data-id="<%= worker.id %>"
+            data-url="<%= worker_path(worker) %>" data-order-url="<%= worker_order_path %>"
+            data-action="dragstart->sortable#start dragend->sortable#end dragover->sortable#allowMove drop->sortable#move"><%= worker.name %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% tasks.each do |task| %>
+      <tr>
+        <th scope="row" draggable="true" class="grabbable"
+            data-sortable-target="item" data-group="tasks" data-id="<%= task.id %>"
+            data-url="<%= task_path(task) %>" data-order-url="<%= task_order_path %>"
+            data-action="dragstart->sortable#start dragend->sortable#end dragover->sortable#allowMove drop->sortable#move"><%= task.name %></th>
+        <% workers.each do |worker| %>
+          <td>
+            <%= button_to "", task_progress_path(task, worker_id: worker.id), method: :patch,
+                  class: bubble_class(task, worker), aria: { label: "#{task.name}, #{worker.name}" } %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

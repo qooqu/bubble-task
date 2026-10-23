@@ -1,0 +1,26 @@
+<% if Current.user.guest? %>
+  <p>Welcome to Bubble Task! Try it out in the sandbox below. <%= link_to "Sign up", new_registration_path %> to save your work.</p>
+  <p>
+    This sandbox will be deleted in
+    <%= tag.time hours_until(Current.user.deletion_time), datetime: Current.user.deletion_time.iso8601, data: { controller: "hours-left" } %>.
+  </p>
+<% end %>
+
+<%= form_with model: Worker.new, class: "add-form", data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |form| %>
+  <%= form.text_field :name, required: true, maxlength: 50, autocomplete: "off", placeholder: "Add a worker…", aria: { label: "New worker name" } %>
+<% end %>
+
+<%= form_with model: Task.new, class: "add-form", data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |form| %>
+  <%= form.text_field :name, required: true, maxlength: 50, autocomplete: "off", placeholder: "Add a task…", aria: { label: "New task name" } %>
+<% end %>
+
+<%= render "boards/board", workers: @workers, tasks: @tasks %>
+
+<ul id="howto">
+  <li>Click a bubble to assign a task.</li>
+  <li>Keep clicking to track progress.</li>
+  <li>Each task can be assigned to only one worker.</li>
+  <li>To unassign a task, click until the bubble is full, then click once more.</li>
+  <li>Drag and drop tasks and workers to reorder.</li>
+  <li>You can also drag them to the trash.</li>
+</ul>
