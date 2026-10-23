@@ -62,7 +62,7 @@ class UserTest < ActiveSupport::TestCase
     assert guest.guest?
     assert_match(/\Aguest-\h{16}@guest\.invalid\z/, guest.email_address)
     assert_equal %w[ Jack Jill ], guest.workers.map(&:name)
-    assert_equal [ [ "Build", "Jack", 25 ], [ "Sell", "Jill", 0 ] ],
+    assert_equal [ [ "Build", "Jack", 25 ], [ "Sell", "Jill", 75 ] ],
       guest.tasks.map { |task| [ task.name, task.worker.name, task.percent_complete ] }
   end
 

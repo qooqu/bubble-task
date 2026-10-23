@@ -14,14 +14,14 @@ class User < ApplicationRecord
 
   scope :guests, -> { where(guest: true) }
 
-  # A sandbox account for "Try it out", seeded with the old app's demo board. The
+  # A sandbox account for "Try it out", seeded with a demo board. The
   # .invalid address can never receive mail, and the password is never shown.
   def self.create_guest!
     transaction do
       create!(guest: true, email_address: "guest-#{SecureRandom.hex(8)}@guest.invalid", password: SecureRandom.base58(24)).tap do |user|
         jack, jill = user.workers.create!([ { name: "Jack" }, { name: "Jill" } ])
         user.tasks.create!(name: "Build", worker: jack, percent_complete: 25)
-        user.tasks.create!(name: "Sell", worker: jill)
+        user.tasks.create!(name: "Sell", worker: jill, percent_complete: 75)
       end
     end
   end
