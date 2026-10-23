@@ -55,4 +55,21 @@ class UserTest < ActiveSupport::TestCase
       user.destroy
     end
   end
+
+  test "create_guest! creates a guest with a placeholder email and the demo board" do
+    guest = User.create_guest!
+
+    assert guest.guest?
+    assert_match(/\Aguest-\h{16}@guest\.invalid\z/, guest.email_address)
+    assert_equal %w[ Jack Jill ], guest.workers.map(&:name)
+    assert_equal [ [ "Build", "Jack", 25 ], [ "Sell", "Jill", 0 ] ],
+      guest.tasks.map { |task| [ task.name, task.worker.name, task.percent_complete ] }
+  end
+
+  test "a guest signing up must choose a new password" do
+    guest = User.find(User.create_guest!.id)
+
+    assert_not guest.update(email_address: "new@example.com", guest: false)
+    assert_includes guest.errors[:password], "can't be blank"
+  end
 end

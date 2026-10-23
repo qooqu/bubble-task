@@ -1,8 +1,10 @@
 require "test_helper"
 
 class BoardsControllerTest < ActionDispatch::IntegrationTest
-  test "show requires logging in" do
-    get root_path
+  test "show requires logging in, and creates no guest" do
+    assert_no_difference -> { User.count } do
+      get root_path
+    end
     assert_redirected_to new_session_path
   end
 
@@ -14,6 +16,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "nav", /#{users(:one).email_address}/
     assert_select "nav button", "Log out"
+    assert_select "p", { text: /Welcome/, count: 0 }
   end
 
   test "show lays out the current user's workers and tasks in order" do

@@ -25,10 +25,11 @@
     <nav>
       <%= link_to "Bubble Task", root_path %>
       <ul>
-        <% if authenticated? %>
+        <% if authenticated? && !Current.user.guest? %>
           <li><%= Current.user.email_address %></li>
           <li><%= button_to "Log out", session_path, method: :delete %></li>
         <% else %>
+          <% if authenticated? %><li>Guest</li><% end %>
           <li><%= link_to "Sign up", new_registration_path %></li>
           <li><%= link_to "Log in", new_session_path %></li>
         <% end %>

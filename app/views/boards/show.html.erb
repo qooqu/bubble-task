@@ -1,3 +1,7 @@
+<% if Current.user.guest? %>
+  <p>Welcome to Bubble Task! Try it out in the sandbox below. <%= link_to "Sign up", new_registration_path %> to save your work.</p>
+<% end %>
+
 <%= form_with model: Worker.new, class: "add-form", data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |form| %>
   <%= form.text_field :name, required: true, maxlength: 50, autocomplete: "off", placeholder: "Add a worker…", aria: { label: "New worker name" } %>
 <% end %>
