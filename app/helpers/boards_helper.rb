@@ -8,7 +8,8 @@ module BoardsHelper
   end
 
   # Hours left until time, to the nearest hour and at most 24: "about 24 hours",
-  # "about 1 hour", or "less than 1 hour".
+  # "about 1 hour", or "less than 1 hour". The hours-left Stimulus controller keeps
+  # it current in the browser, so change both together.
   def hours_until(time)
     hours_left = (time - Time.current) / 1.hour
     return "less than 1 hour" if hours_left < 1
