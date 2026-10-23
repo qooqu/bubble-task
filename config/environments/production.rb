@@ -61,7 +61,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     user_name: Rails.application.credentials.dig(:smtp, :user_name),
     password: Rails.application.credentials.dig(:smtp, :password),
-    address: "smtp.example.com", # TODO: the mail provider's SMTP server
+    address: "smtp.resend.com",
     port: 587,
     authentication: :plain
   }
