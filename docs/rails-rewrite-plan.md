@@ -180,12 +180,12 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Port the CSS and the click-related how-to lines from `main`. The Font Awesome link (only used for the trash icon) moved to PR 5, and the guest welcome text to PR 6.
 - **Tests:** integration tests for owner scoping (user B's IDs return 404), and a system test that adds a worker and a task and clicks a bubble through its full cycle.
 
-### PR 5: Drag-and-drop reorder and trash
+### PR 5: Drag-and-drop reorder and trash: done
 - Add `@rails/request.js` via importmap.
 - `WorkersController#destroy` and `TasksController#destroy` (moved here from PR 4), scoped through `Current.user`, responding with the board.
-- The trash icon: the old app used Font Awesome 4.7 (`fa-trash-o`) from cdnjs for it. An inline SVG avoids an external stylesheet for one icon.
+- The trash icon: the old app used Font Awesome 4.7 (`fa-trash-o`) from cdnjs for it. An inline SVG avoids an external stylesheet for one icon. It sits in the board's top-left header cell, as in the old app.
 - Add the drag-and-drop lines to the how-to list ("Drag and drop tasks and workers to reorder.", "You can also drag them to the trash.").
-- `sortable_controller` (Stimulus) for native HTML5 drag-and-drop on worker and task headers and the trash.
+- `sortable_controller` (Stimulus) for native HTML5 drag-and-drop on worker and task headers and the trash. As in the old app, a dropped item takes the spot of the item it lands on, and the board only accepts drops of a worker onto a worker or a task onto a task.
 - `WorkerOrdersController#update` and `TaskOrdersController#update`, which call `Current.user.workers.reposition(ids)` / `Current.user.tasks.reposition(ids)`. Dropping onto the trash reuses `destroy`.
 - **Tests:** integration tests for the two order controllers (including foreign IDs being ignored), and a system test that reorders tasks and drags one to the trash.
 

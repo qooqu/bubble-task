@@ -10,4 +10,9 @@ class TasksController < ApplicationController
       head :unprocessable_content
     end
   end
+
+  def destroy
+    Current.user.tasks.find(params[:id]).destroy!
+    render_board
+  end
 end
