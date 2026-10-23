@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "Bubble Task <no-reply@bubbletask.greenwold.com>"
   layout "mailer"
 end

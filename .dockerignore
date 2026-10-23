@@ -46,6 +46,12 @@
 # Ignore development files
 /.devcontainer
 
+# Ignore development-only files
+/.claude
+/docs
+/CLAUDE.md
+/compose.yml
+
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*

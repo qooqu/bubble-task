@@ -107,10 +107,10 @@ resource :task_order,   only: :update  # TaskOrdersController,   params: ids[]
 - Provision a small VPS (Hetzner or DigitalOcean, about $5/mo) and point a domain's A record at it.
 - In `config/deploy.yml`:
   - server IP
-  - image registry (GHCR or Docker Hub)
+  - Kamal's local registry (`localhost:5555`, the generated default): Kamal runs a registry on the deploying machine and the server pulls from it through an SSH tunnel, so no hosted registry is needed
   - `proxy: { ssl: true, host: <domain> }`
   - keep the generated `bubble_task_storage:/rails/storage` volume, which is where the SQLite files live
-- Secrets: put `RAILS_MASTER_KEY` and `KAMAL_REGISTRY_PASSWORD` in `.kamal/secrets`. The SMTP credentials live in Rails credentials, which the master key unlocks.
+- Secrets: put `RAILS_MASTER_KEY` in `.kamal/secrets`. The SMTP credentials live in Rails credentials, which the master key unlocks.
 - Create an account with the mail provider, verify the sending domain and add its DNS records before the first deploy.
 - Leave `SOLID_QUEUE_IN_PUMA=true` (the default) so the cleanup job runs without a separate worker.
 - Run `kamal setup` once, then `kamal deploy` for each release.
@@ -205,10 +205,10 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - **Run Kamal without Ruby on the host.** Use the official `ghcr.io/basecamp/kamal` image, pinned to the version in `Gemfile.lock` (2.12.0 at PR 1). Wrap it in a short script so `kamal deploy` stays one command. The container needs:
   - the repo mounted, plus the Docker socket so it can build and push the image
   - the host's SSH agent, to reach the server. Development moved from macOS to Linux (x86_64, native Docker) after PR 6, so mount `$SSH_AUTH_SOCK` directly and point the container's `SSH_AUTH_SOCK` at it. No Colima.
-  - `KAMAL_REGISTRY_PASSWORD` passed through from the host environment
+  - host networking, so it can reach Kamal's local registry on the host's `localhost:5555`
   - Hooks run inside this container, so they can only use tools the image has.
 - Add `/.claude`, `/docs`, `/CLAUDE.md` and `/compose.yml` to `.dockerignore`, so dev-only files stay out of the production image.
-- Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated) and `KAMAL_REGISTRY_PASSWORD` from the environment. No password manager integration: KeePass holds a backup of the master key only.
+- Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated). No password manager integration: KeePass holds a backup of the master key only.
 - Kamal hooks in `.kamal/hooks/`:
   - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
   - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead, and abort unless it succeeded. The Kamal image has neither `gh` nor `curl` (checked: v2.12.0), so keep the hook in Ruby like the sample and call the GitHub check-runs API with `Net::HTTP` and a `GITHUB_TOKEN` passed in.
@@ -216,10 +216,11 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Production SMTP settings and `default_url_options`, with credentials in `config/credentials.yml.enc`.
 - **Editing credentials:** the dev container has no text editor, so add `nano` to the packages in `Dockerfile.dev`, then run `docker compose exec -e EDITOR=nano web bin/rails credentials:edit`. Add the same command to CLAUDE.md's Environment section.
 - Outside the repo (do before merging): provision the VPS, point DNS at it, verify the domain with the mail provider and add its records.
+- As built: `bin/kamal` (replacing the bundler binstub) is the wrapper. It also mounts `~/.ssh/known_hosts`, which `pre-build` needs for `git ls-remote` over the SSH remote, and passes `GITHUB_TOKEN` through for `pre-deploy`. CI runs on pushes to `main` only, so merge commits on `rails-rewrite` have no check runs and `pre-deploy` blocks them. Until cutover, deploy from a PR branch whose CI passed (`pull_request` checks attach to the PR's head commit), then merge. After cutover, deploy from `main`. The server IP is a `TODO` placeholder. The domain is `bubbletask.greenwold.com`, with no temporary hostname: it currently serves the old app from Netlify (greenwold.com's DNS is Netlify DNS), so the first deploy takes it over. Remove the custom domain from the Netlify site, then point its A record at the VPS. Mail goes through Resend's SMTP (`smtp.resend.com`, user name `resend`, an API key as the password, both in credentials) from `no-reply@bubbletask.greenwold.com`. Resend's sending domain is the subdomain, so its DNS records don't touch the ImprovMX forwarding records on greenwold.com. The server is a TierHive NAT VPS (`tony`: 2 GB RAM, 15 GB NVMe, Ubuntu 26.04, x86_64) reached over SSH on a forwarded port. TierHive's HAProxy terminates SSL, so `proxy.ssl` is false. It has a 2 GB swap file (`/swapfile`, in `/etc/fstab`, `vm.swappiness=10`), set up by hand since Kamal doesn't manage it.
 - **Check:** `kamal setup` and `kamal deploy` succeed, `pre-build` blocks a deploy with uncommitted changes, `pre-deploy` blocks a commit whose CI failed or hasn't run, the site loads over HTTPS, a real reset email arrives, and the guest cleanup job shows up in Solid Queue.
 
 ### Cutover (after PR 7)
 - Merge `rails-rewrite` into `main`.
 - Add `refs/heads/main` to the "Require CI on rails-rewrite" ruleset (or a copy of it), so `main` also requires the CI checks.
-- Turn off auto-deploy and shut down the Heroku app and the Netlify site.
+- Turn off auto-deploy and shut down the Heroku app and the Netlify site. (PR 7 already moved `bubbletask.greenwold.com` off Netlify to the new app, so nothing user-facing depends on them.)
 - Optional follow-up PR: Litestream backups.

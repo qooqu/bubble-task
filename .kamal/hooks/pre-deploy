@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+# Aborts the deploy unless every GitHub Actions check passed for the commit being deployed.
+#
+# Needs a GITHUB_TOKEN that can read the repository's checks (bin/kamal passes it through).
+# The Kamal image has neither gh nor curl, hence Net::HTTP.
+
+require "json"
+require "net/http"
+
+REPO = "qooqu/bubble-task"
+
+abort "GITHUB_TOKEN is not set, aborting..." if ENV["GITHUB_TOKEN"].to_s.empty?
+
+sha = ENV.fetch("KAMAL_VERSION")
+uri = URI("https://api.github.com/repos/#{REPO}/commits/#{sha}/check-runs?per_page=100")
+response = Net::HTTP.get_response(uri, "Accept" => "application/vnd.github+json", "Authorization" => "Bearer #{ENV["GITHUB_TOKEN"]}")
+abort "GitHub returned #{response.code} for #{uri}, aborting..." unless response.is_a?(Net::HTTPSuccess)
+
+check_runs = JSON.parse(response.body)["check_runs"]
+abort "CI hasn't run for #{sha}, aborting..." if check_runs.empty?
+
+failed = check_runs.reject { |run| run["conclusion"] == "success" }
+if failed.any?
+  failed.each { |run| warn "#{run["name"]}: #{run["conclusion"] || run["status"]} (#{run["html_url"]})" }
+  abort "CI hasn't passed for #{sha}, aborting..."
+end
+
+puts "CI passed for #{sha}"

@@ -7,7 +7,7 @@ image: bubble_task
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
+    - 207.241.173.35
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -20,9 +20,10 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+# TierHive's HAProxy terminates SSL and forwards plain HTTP to port 80.
+proxy:
+  ssl: false
+  host: bubbletask.greenwold.com
 
 # Where you keep your container images.
 registry:
@@ -90,9 +91,9 @@ builder:
   #   - GITHUB_TOKEN
   #   - RAILS_MASTER_KEY
 
-# Use a different ssh user than root
-# ssh:
-#   user: app
+# TierHive's NAT forwards this port to the VPS's SSH port.
+ssh:
+  port: 3768
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:
