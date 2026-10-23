@@ -222,5 +222,5 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 ### Cutover (after PR 7)
 - Merge `rails-rewrite` into `main`.
 - Add `refs/heads/main` to the "Require CI on rails-rewrite" ruleset (or a copy of it), so `main` also requires the CI checks.
-- Turn off auto-deploy and shut down the Heroku app and the Netlify site.
+- Turn off auto-deploy and shut down the Heroku app and the Netlify site. (PR 7 already moved `bubbletask.greenwold.com` off Netlify to the new app, so nothing user-facing depends on them.)
 - Optional follow-up PR: Litestream backups.
