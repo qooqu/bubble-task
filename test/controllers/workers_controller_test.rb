@@ -29,7 +29,9 @@ class WorkersControllerTest < ActionDispatch::IntegrationTest
 
     assert_nil tasks(:build).reload.worker
     assert_turbo_stream action: :replace, target: "board" do
-      assert_select "thead th[scope=col]", "Jill"
+      assert_select "thead th[scope=col]" do |headers|
+        assert_equal %w[ Jill ], headers.map(&:text)
+      end
     end
   end
 

@@ -4,12 +4,12 @@ import { destroy, patch } from "@rails/request.js"
 // Drag and drop on the board: drop a worker or task onto another of the same kind to move it
 // to that spot, or onto the trash to delete it. The server answers with the re-rendered board.
 export default class extends Controller {
-  static targets = [ "item", "trash" ]
+  static targets = [ "item" ]
 
   start(event) {
     this.dragged = event.currentTarget
     event.dataTransfer.effectAllowed = "move"
-    event.dataTransfer.setData("text/plain", this.dragged.textContent.trim())
+    event.dataTransfer.setData("text/plain", "") // Firefox only starts a drag that carries data
   }
 
   end() {
