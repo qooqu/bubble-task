@@ -3,10 +3,11 @@
 # Keep the tag in step with kamal in Gemfile.lock.
 cd "$(dirname "$0")/.." || exit
 
-exec docker run --rm --interactive $([ -t 0 ] && echo --tty) \
+# Host networking lets the image reach Kamal's local registry on localhost:5555.
+exec docker run --rm --interactive $([ -t 0 ] && echo --tty) --network host \
   --volume "$PWD:/workdir" \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --mount type=bind,source="$SSH_AUTH_SOCK",target=/ssh-agent --env SSH_AUTH_SOCK=/ssh-agent \
   --mount type=bind,source="$HOME/.ssh/known_hosts",target=/root/.ssh/known_hosts \
-  --env KAMAL_REGISTRY_PASSWORD --env GITHUB_TOKEN \
+  --env GITHUB_TOKEN \
   ghcr.io/basecamp/kamal:v2.12.0 "$@"

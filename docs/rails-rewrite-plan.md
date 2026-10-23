@@ -107,10 +107,10 @@ resource :task_order,   only: :update  # TaskOrdersController,   params: ids[]
 - Provision a small VPS (Hetzner or DigitalOcean, about $5/mo) and point a domain's A record at it.
 - In `config/deploy.yml`:
   - server IP
-  - image registry (GHCR or Docker Hub)
+  - Kamal's local registry (`localhost:5555`, the generated default): Kamal runs a registry on the deploying machine and the server pulls from it through an SSH tunnel, so no hosted registry is needed
   - `proxy: { ssl: true, host: <domain> }`
   - keep the generated `bubble_task_storage:/rails/storage` volume, which is where the SQLite files live
-- Secrets: put `RAILS_MASTER_KEY` and `KAMAL_REGISTRY_PASSWORD` in `.kamal/secrets`. The SMTP credentials live in Rails credentials, which the master key unlocks.
+- Secrets: put `RAILS_MASTER_KEY` in `.kamal/secrets`. The SMTP credentials live in Rails credentials, which the master key unlocks.
 - Create an account with the mail provider, verify the sending domain and add its DNS records before the first deploy.
 - Leave `SOLID_QUEUE_IN_PUMA=true` (the default) so the cleanup job runs without a separate worker.
 - Run `kamal setup` once, then `kamal deploy` for each release.
@@ -205,10 +205,10 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - **Run Kamal without Ruby on the host.** Use the official `ghcr.io/basecamp/kamal` image, pinned to the version in `Gemfile.lock` (2.12.0 at PR 1). Wrap it in a short script so `kamal deploy` stays one command. The container needs:
   - the repo mounted, plus the Docker socket so it can build and push the image
   - the host's SSH agent, to reach the server. Development moved from macOS to Linux (x86_64, native Docker) after PR 6, so mount `$SSH_AUTH_SOCK` directly and point the container's `SSH_AUTH_SOCK` at it. No Colima.
-  - `KAMAL_REGISTRY_PASSWORD` passed through from the host environment
+  - host networking, so it can reach Kamal's local registry on the host's `localhost:5555`
   - Hooks run inside this container, so they can only use tools the image has.
 - Add `/.claude`, `/docs`, `/CLAUDE.md` and `/compose.yml` to `.dockerignore`, so dev-only files stay out of the production image.
-- Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated) and `KAMAL_REGISTRY_PASSWORD` from the environment. No password manager integration: KeePass holds a backup of the master key only.
+- Set up `.kamal/secrets`: `RAILS_MASTER_KEY` from `config/master.key` (as generated). No password manager integration: KeePass holds a backup of the master key only.
 - Kamal hooks in `.kamal/hooks/`:
   - **Enable `pre-build` as-is** (rename it, drop `.sample`, keep it executable). It aborts on uncommitted changes or a commit that isn't pushed.
   - **Rewrite `pre-deploy`, then enable it.** The sample checks GitHub's commit status API, which GitHub Actions doesn't report to, so it would wait 12 minutes and fail. Check the Actions run for `$KAMAL_VERSION` instead, and abort unless it succeeded. The Kamal image has neither `gh` nor `curl` (checked: v2.12.0), so keep the hook in Ruby like the sample and call the GitHub check-runs API with `Net::HTTP` and a `GITHUB_TOKEN` passed in.
