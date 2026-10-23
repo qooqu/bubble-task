@@ -2,8 +2,7 @@
   <p>Welcome to Bubble Task! Try it out in the sandbox below. <%= link_to "Sign up", new_registration_path %> to save your work.</p>
   <p>
     This sandbox is deleted in
-    <%= tag.time distance_of_time_in_words_to_now(Current.user.expires_at), datetime: Current.user.expires_at.iso8601,
-          data: { controller: "countdown", countdown_until_value: Current.user.expires_at.iso8601 } %>.
+    <%= tag.time hours_until(Current.user.deletion_time), datetime: Current.user.deletion_time.iso8601 %>.
   </p>
 <% end %>
 
