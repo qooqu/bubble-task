@@ -4,7 +4,9 @@ class Task < ApplicationRecord
   belongs_to :user
   belongs_to :worker, optional: true
 
-  validates :name, presence: true
+  normalizes :name, with: ->(name) { name.strip }
+
+  validates :name, presence: true, length: { maximum: 50 }
   validates :percent_complete, inclusion: { in: [ 0, 25, 50, 75, 100 ] }
   validate :worker_has_same_user, if: :worker
 

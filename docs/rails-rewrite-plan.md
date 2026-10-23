@@ -176,6 +176,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - `WorkersController#create`, `TasksController#create` and `Tasks::ProgressesController#update` (bubble clicks, calls `Task#advance!`), all scoped through `Current.user`, all responding with `turbo_stream.replace "board"` via a small `BoardRendering` concern. `destroy` moved to PR 5, where its only UI (the trash) arrives.
 - A `reset-form` Stimulus controller clears an add form after it submits, keeping focus there for the next entry.
 - Bubbles as `button_to` buttons.
+- Worker and task names are stripped (`normalizes`) and capped at 50 characters, with a matching `maxlength` on the add forms.
 - Port the CSS and the click-related how-to lines from `main`. The Font Awesome link (only used for the trash icon) moved to PR 5, and the guest welcome text to PR 6.
 - **Tests:** integration tests for owner scoping (user B's IDs return 404), and a system test that adds a worker and a task and clicks a bubble through its full cycle.
 

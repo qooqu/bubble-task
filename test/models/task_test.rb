@@ -61,6 +61,15 @@ class TaskTest < ActiveSupport::TestCase
     assert_not Task.new(user: users(:one)).valid?
   end
 
+  test "strips surrounding whitespace from the name" do
+    assert_equal "Celebrate", Task.new(name: "  Celebrate  ").name
+  end
+
+  test "name can be at most 50 characters" do
+    assert Task.new(user: users(:one), name: "a" * 50).valid?
+    assert_not Task.new(user: users(:one), name: "a" * 51).valid?
+  end
+
   test "new tasks go to the end of their user's list" do
     task = users(:one).tasks.create!(name: "Celebrate")
 
