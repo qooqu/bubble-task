@@ -12,7 +12,7 @@ A small task board: workers are columns, tasks are rows, and clicking a bubble a
 - Never target `main` before cutover. Netlify and Heroku may still auto-deploy the live app from it.
 
 ## Environment
-- There is no Ruby on the host. Ruby 4.0 and Rails 8.1 run in docker compose (`compose.yml`, `Dockerfile.dev`). `Dockerfile` is the production image, used only by Kamal.
+- The host has Ruby (via mise) and the bundled gems only for editor tooling such as Ruby LSP. Don't run the app, tests or `bin/rails` commands there. Ruby 4.0 and Rails 8.1 run in docker compose (`compose.yml`, `Dockerfile.dev`). `Dockerfile` is the production image, used only by Kamal.
 - Start the app with `docker compose up -d` and open http://localhost:3000. The `web` service runs `bin/setup`, which installs gems into the `bundle` volume, prepares the database and starts the server.
 - Run commands with `docker compose exec web …` (e.g. `bin/rails console`, `bin/rails db:migrate`, `bin/rails generate …`).
 - After changing the Gemfile, run `docker compose restart web`. `bin/setup` re-runs `bundle install` on start.
