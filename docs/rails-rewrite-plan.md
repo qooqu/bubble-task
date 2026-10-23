@@ -189,14 +189,15 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - `WorkerOrdersController#update` and `TaskOrdersController#update`, which call `Current.user.workers.reposition(ids)` / `Current.user.tasks.reposition(ids)`. Dropping onto the trash reuses `destroy`.
 - **Tests:** integration tests for the two order controllers (including foreign IDs being ignored), and a system test that reorders tasks and drags one to the trash.
 
-### PR 6: Guest sandbox
+### PR 6: Guest sandbox: done
 - `User.create_guest!`: placeholder `.invalid` email and random password, seeded with Jack, Jill, Build and Sell, in one transaction.
 - `GuestsController#create` (`resource :guest, only: :create`, `allow_unauthenticated_access`), plus a "Try it out" `button_to` on the log-in page. Guests have normal sessions, so no other controller needs changes.
 - Signing up as a guest converts the guest account, replacing the placeholder email and password with the ones entered and keeping its data. Logging in abandons it.
 - Signing up while logged in as a real (non-guest) user currently starts a second session and leaves the first open. Redirect those users away from sign-up instead.
 - `scope :guests, -> { where(guest: true) }` on `User`, and `CleanupGuestsJob` in `config/recurring.yml`, deleting `User.guests.where(created_at: ...7.days.ago)`.
 - Nav shows "Guest" (not the placeholder email), and the board shows the old app's welcome text for guests ("Welcome to Bubble Task! Try it out in the sandbox below. Sign up to save your work.").
-- Password reset skips guests, so nothing is mailed to a `.invalid` address.
+- Password reset skips guests, so nothing is mailed to a `.invalid` address. (Done as `User.find_by(email_address:, guest: false)`; the `registered` scope still waits for a query that needs it.)
+- As built: the nav for guests shows "Guest", "Sign up" and "Log in" (no "Log out"). `CleanupGuestsJob` runs daily at 4am and goes by `created_at`, so even an active guest is deleted after 7 days.
 - **Tests:** "Try it out" creates a seeded, logged-in guest; a logged-out GET of `/` creates no user; guest-to-signup conversion keeps the data and replaces the placeholder email and password (the user can log in with the new password), a reset request for a guest's address sends no mail, and the cleanup job deletes only stale guests. Call the job directly in tests: only production uses Solid Queue, so `recurring.yml` doesn't run in development or test.
 
 ### PR 7: Production deployment
