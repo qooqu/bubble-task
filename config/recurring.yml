@@ -15,4 +15,4 @@ production:
     schedule: every hour at minute 12
   cleanup_guests:
     class: CleanupGuestsJob
-    schedule: every day at 4am
+    schedule: every hour at minute 42

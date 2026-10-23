@@ -1,9 +1,9 @@
 require "test_helper"
 
 class CleanupGuestsJobTest < ActiveJob::TestCase
-  test "deletes guests older than a week, along with their boards" do
-    stale = travel_to(8.days.ago) { User.create_guest! }
-    fresh = User.create_guest!
+  test "deletes guests older than a day, along with their boards" do
+    stale = travel_to(25.hours.ago) { User.create_guest! }
+    fresh = travel_to(23.hours.ago) { User.create_guest! }
 
     assert_difference -> { Worker.count } => -2, -> { Task.count } => -2 do
       CleanupGuestsJob.perform_now

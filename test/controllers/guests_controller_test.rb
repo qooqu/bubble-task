@@ -12,6 +12,8 @@ class GuestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav", /Guest/
     assert_select "nav", { text: /guest\.invalid/, count: 0 }
     assert_select "p", /Welcome to Bubble Task!/
+    assert_select "p", /This sandbox is deleted in/
+    assert_select "p time[datetime=?]", User.last.expires_at.iso8601
     assert_select "#board thead th[scope=col]" do |headers|
       assert_equal %w[ Jack Jill ], headers.map(&:text)
     end

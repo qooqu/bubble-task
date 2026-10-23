@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  GUEST_LIFETIME = 24.hours
+
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :tasks, -> { order(:position) }, dependent: :delete_all
@@ -22,5 +24,10 @@ class User < ApplicationRecord
         user.tasks.create!(name: "Sell", worker: jill)
       end
     end
+  end
+
+  # When CleanupGuestsJob may delete this guest and their board.
+  def expires_at
+    created_at + GUEST_LIFETIME
   end
 end
