@@ -1,7 +1,7 @@
 <% if Current.user.guest? %>
   <p>Welcome to Bubble Task! Try it out in the sandbox below. <%= link_to "Sign up", new_registration_path %> to save your work.</p>
   <p>
-    This sandbox is deleted in
+    This sandbox is deleted in about
     <%= tag.time hours_until(Current.user.deletion_time), datetime: Current.user.deletion_time.iso8601 %>.
   </p>
 <% end %>
