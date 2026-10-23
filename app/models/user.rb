@@ -26,11 +26,9 @@ class User < ApplicationRecord
     end
   end
 
-  # When CleanupGuestsJob deletes this guest and their board: its first hourly run
+  # When CleanupGuestsJob deletes this guest and their board: the first hour
   # after GUEST_LIFETIME is up.
   def deletion_time
-    expiry = created_at + GUEST_LIFETIME
-    run = expiry.change(min: CleanupGuestsJob::MINUTE)
-    run > expiry ? run : run + 1.hour
+    (created_at + GUEST_LIFETIME).beginning_of_hour + 1.hour
   end
 end

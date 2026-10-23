@@ -75,12 +75,9 @@ class UserTest < ActiveSupport::TestCase
 
   test "a guest is deleted on CleanupGuestsJob's first run after 24 hours" do
     guest = User.new(created_at: Time.zone.local(2026, 10, 23, 9, 15))
-    assert_equal Time.zone.local(2026, 10, 24, 9, 42), guest.deletion_time
+    assert_equal Time.zone.local(2026, 10, 24, 10), guest.deletion_time
 
-    guest.created_at = Time.zone.local(2026, 10, 23, 9, 50)
-    assert_equal Time.zone.local(2026, 10, 24, 10, 42), guest.deletion_time
-
-    guest.created_at = Time.zone.local(2026, 10, 23, 9, 42)
-    assert_equal Time.zone.local(2026, 10, 24, 10, 42), guest.deletion_time
+    guest.created_at = Time.zone.local(2026, 10, 23, 9)
+    assert_equal Time.zone.local(2026, 10, 24, 10), guest.deletion_time
   end
 end

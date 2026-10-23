@@ -14,9 +14,9 @@ class CleanupGuestsJobTest < ActiveJob::TestCase
     assert User.exists?(users(:one).id)
   end
 
-  test "is scheduled at its MINUTE past each hour" do
+  test "is scheduled on the hour, as User#deletion_time expects" do
     schedule = YAML.load_file(Rails.root.join("config/recurring.yml")).dig("production", "cleanup_guests", "schedule")
-    assert_equal "every hour at minute #{CleanupGuestsJob::MINUTE}", schedule
+    assert_equal "every hour", schedule
   end
 
   test "keeps registered users however old they are" do
