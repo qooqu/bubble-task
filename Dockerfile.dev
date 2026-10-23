@@ -15,3 +15,10 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 ENV BUNDLE_PATH="/usr/local/bundle"
+
+# Run as uid 1000, like the production image, so files written to the bind-mounted
+# app (generators, logs, the database) belong to the host user rather than root.
+RUN groupadd --system --gid 1000 rails && \
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    mkdir -p "$BUNDLE_PATH" && chown rails:rails "$BUNDLE_PATH"
+USER 1000:1000

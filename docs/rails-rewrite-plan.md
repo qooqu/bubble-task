@@ -14,11 +14,11 @@ The goal is a single Rails 8 app with these choices (all confirmed with the user
 - **Data:** start fresh, with no Mongo migration.
 
 ## Setup
-- Branch `rails-rewrite`. Ruby isn't needed on the Mac, so generate the app from a throwaway container:
+- Branch `rails-rewrite`. Ruby isn't needed on the host, so generate the app from a throwaway container:
   `docker run --rm -v "$PWD":/rails -w /rails ruby:<current stable> sh -c "gem install rails && rails new . --name=bubble_task --database=sqlite3 --skip-action-mailbox --skip-action-text --skip-active-storage"` (Rails 8.x).
 - As the branch's first commit, delete the old code: `api/`, `web/`, the root `index.html` and `notes.md`. It stays readable on `main`, so the CSS, favicon and `Bubble.js` logic can be ported with `git show main:<path>`.
 - **Local dev runs in docker compose.** The generated `Dockerfile` stays production-only (Kamal uses it). Add separate dev files:
-  - `Dockerfile.dev`: the same `ruby` slim base image as the generated `Dockerfile`, plus the packages needed to build gems and `sqlite3`. Gems aren't baked into the image: the `web` service runs `bin/setup`, which installs them (dev and test included) into the `bundle` volume, prepares the database and starts the server.
+  - `Dockerfile.dev`: the same `ruby` slim base image as the generated `Dockerfile`, plus the packages needed to build gems and `sqlite3`. Gems aren't baked into the image: the `web` service runs `bin/setup`, which installs them (dev and test included) into the `bundle` volume, prepares the database and starts the server. It runs as a `rails` user with uid/gid 1000, like the production image, so on a Linux host the files it writes to the bind mount belong to the host user, not root. (Added after PR 6, when development moved from macOS to Linux.)
   - `compose.yml`:
     - **`web` service:**
       - builds `Dockerfile.dev`
@@ -204,7 +204,7 @@ The `next-pr` skill reads the plan and branches from a base, so both need to exi
 - Fill in `config/deploy.yml`: server, registry, `proxy` host/SSL, and the storage volume.
 - **Run Kamal without Ruby on the host.** Use the official `ghcr.io/basecamp/kamal` image, pinned to the version in `Gemfile.lock` (2.12.0 at PR 1). Wrap it in a short script so `kamal deploy` stays one command. The container needs:
   - the repo mounted, plus the Docker socket so it can build and push the image
-  - the Mac's SSH agent, to reach the server. With Colima, start it with `colima start --ssh-agent` and mount the forwarded agent socket.
+  - the host's SSH agent, to reach the server. Development moved from macOS to Linux (x86_64, native Docker) after PR 6, so mount `$SSH_AUTH_SOCK` directly and point the container's `SSH_AUTH_SOCK` at it. No Colima.
   - `KAMAL_REGISTRY_PASSWORD` passed through from the host environment
   - Hooks run inside this container, so they can only use tools the image has.
 - Add `/.claude`, `/docs`, `/CLAUDE.md` and `/compose.yml` to `.dockerignore`, so dev-only files stay out of the production image.
