@@ -13,7 +13,7 @@ REPO = "qooqu/bubble-task"
 abort "GITHUB_TOKEN is not set, aborting..." if ENV["GITHUB_TOKEN"].to_s.empty?
 
 sha = ENV.fetch("KAMAL_VERSION")
-uri = URI("https://api.github.com/repos/#{REPO}/commits/#{sha}/check-runs")
+uri = URI("https://api.github.com/repos/#{REPO}/commits/#{sha}/check-runs?per_page=100")
 response = Net::HTTP.get_response(uri, "Accept" => "application/vnd.github+json", "Authorization" => "Bearer #{ENV["GITHUB_TOKEN"]}")
 abort "GitHub returned #{response.code} for #{uri}, aborting..." unless response.is_a?(Net::HTTPSuccess)
 

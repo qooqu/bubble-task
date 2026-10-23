@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.." || exit
 exec docker run --rm --interactive $([ -t 0 ] && echo --tty) \
   --volume "$PWD:/workdir" \
   --volume /var/run/docker.sock:/var/run/docker.sock \
-  --volume "$SSH_AUTH_SOCK:/ssh-agent" --env SSH_AUTH_SOCK=/ssh-agent \
-  --volume "$HOME/.ssh/known_hosts:/root/.ssh/known_hosts" \
+  --mount type=bind,source="$SSH_AUTH_SOCK",target=/ssh-agent --env SSH_AUTH_SOCK=/ssh-agent \
+  --mount type=bind,source="$HOME/.ssh/known_hosts",target=/root/.ssh/known_hosts \
   --env KAMAL_REGISTRY_PASSWORD --env GITHUB_TOKEN \
   ghcr.io/basecamp/kamal:v2.12.0 "$@"
