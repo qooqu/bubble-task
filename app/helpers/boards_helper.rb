@@ -7,8 +7,12 @@ module BoardsHelper
     "bubble bubble-#{task.percent_complete.to_s.rjust(2, "0")}"
   end
 
-  # Whole hours left until time, rounded up and kept between 1 and 24: "24 hours", "1 hour".
+  # Hours left until time, to the nearest hour and at most 24: "about 24 hours",
+  # "about 1 hour", or "less than 1 hour".
   def hours_until(time)
-    pluralize(((time - Time.current) / 1.hour).ceil.clamp(1..24), "hour")
+    hours_left = (time - Time.current) / 1.hour
+    return "less than 1 hour" if hours_left < 1
+
+    "about #{pluralize(hours_left.round.clamp(..24), "hour")}"
   end
 end

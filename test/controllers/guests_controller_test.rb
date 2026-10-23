@@ -12,7 +12,7 @@ class GuestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav", /Guest/
     assert_select "nav", { text: /guest\.invalid/, count: 0 }
     assert_select "p", /Welcome to Bubble Task!/
-    assert_select "p time[datetime=?]", User.last.deletion_time.iso8601, text: "24 hours"
+    assert_select "p time[datetime=?]", User.last.deletion_time.iso8601, text: "about 24 hours"
     assert_select "#board thead th[scope=col]" do |headers|
       assert_equal %w[ Jack Jill ], headers.map(&:text)
     end
