@@ -22,7 +22,7 @@ servers:
 #
 proxy:
   ssl: true
-  host: bubbletask.example.com # TODO: the app's domain
+  host: bubbletask.greenwold.com
 
 # Where you keep your container images.
 registry:
