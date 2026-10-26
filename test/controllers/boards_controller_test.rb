@@ -17,6 +17,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav", /#{users(:one).email_address}/
     assert_select "nav button", "Log out"
     assert_select "p", { text: /Welcome/, count: 0 }
+    assert_select "details#howto:not([open])"
   end
 
   test "show lays out the current user's workers and tasks in order" do

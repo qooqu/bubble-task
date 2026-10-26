@@ -422,8 +422,21 @@ tbody tr:last-child > * {
 
 #howto {
   width: 100%;
-  padding-left: 1.125rem;
   color: var(--muted);
   font-size: 0.875rem;
   line-height: 1.7;
+}
+
+#howto summary {
+  width: fit-content;
+  cursor: pointer;
+}
+
+#howto summary:hover {
+  color: var(--text);
+}
+
+#howto ul {
+  margin-top: 0.25rem;
+  padding-left: 1.125rem;
 }
