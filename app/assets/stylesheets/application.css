@@ -17,8 +17,6 @@
   --ring-faint: #cfc8bf;
   --input-bg: #ffffff;
   --hover: rgb(0 0 0 / 0.05);
-  --nav: #ffa500;
-  --nav-text: #1f1d1a;
   --accent: #b45309;
   --accent-soft: rgb(180 83 9 / 0.22);
   --on-accent: #ffffff;
@@ -40,8 +38,6 @@
     --ring-faint: #4a443e;
     --input-bg: #1f1c19;
     --hover: rgb(255 255 255 / 0.06);
-    --nav: #241f1b;
-    --nav-text: #f2eee8;
     --accent: #c9834e;
     --accent-soft: rgb(201 131 78 / 0.28);
     --on-accent: #181614;
@@ -79,8 +75,7 @@ nav {
   width: 100%;
   min-height: 3.5rem;
   padding: 0.5rem max(1rem, (100% - 48rem) / 2);
-  background: var(--nav);
-  color: var(--nav-text);
+  border-bottom: 1px solid var(--line);
 }
 
 nav a {
@@ -100,6 +95,7 @@ nav > a {
 .logo {
   width: 1.25rem;
   height: 1.25rem;
+  color: var(--accent);
 }
 
 nav ul {
@@ -135,22 +131,22 @@ nav button {
 
 nav ul a:hover,
 nav button:hover {
-  background-color: color-mix(in srgb, var(--nav-text) 10%, transparent);
+  background-color: color-mix(in srgb, var(--text) 10%, transparent);
 }
 
 nav ul a:focus-visible,
 nav button:focus-visible {
-  outline: 2px solid var(--nav-text);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
 nav .primary {
-  background-color: color-mix(in srgb, var(--nav-text) 12%, transparent);
+  background-color: color-mix(in srgb, var(--text) 12%, transparent);
   font-weight: 600;
 }
 
 nav .primary:hover {
-  background-color: color-mix(in srgb, var(--nav-text) 20%, transparent);
+  background-color: color-mix(in srgb, var(--text) 20%, transparent);
 }
 
 /* Page */
