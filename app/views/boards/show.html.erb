@@ -22,11 +22,14 @@
   <%= render "boards/board", workers: @workers, tasks: @tasks %>
 </div>
 
-<ul id="howto">
-  <li>Click a bubble to assign a task.</li>
-  <li>Keep clicking to track progress.</li>
-  <li>Each task can be assigned to only one worker.</li>
-  <li>To unassign a task, click until the bubble is full, then click once more.</li>
-  <li>Drag and drop tasks and workers to reorder.</li>
-  <li>You can also drag them to the trash.</li>
-</ul>
+<%= tag.details id: "howto", open: Current.user.guest? do %>
+  <summary>How it works</summary>
+  <ul>
+    <li>Click a bubble to assign a task.</li>
+    <li>Keep clicking to track progress.</li>
+    <li>Each task can be assigned to only one worker.</li>
+    <li>To unassign a task, click until the bubble is full, then click once more.</li>
+    <li>Drag and drop tasks and workers to reorder.</li>
+    <li>You can also drag them to the trash.</li>
+  </ul>
+<% end %>
