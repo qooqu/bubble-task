@@ -12,6 +12,7 @@ export default class extends Controller {
   connect() {
     this.requests = Promise.resolve()
     this.pending = 0
+    this.element.ariaBusy = null
   }
 
   advance(event) {
@@ -32,7 +33,7 @@ export default class extends Controller {
   enqueue(form) {
     this.pending++
     this.element.ariaBusy = "true"
-    this.requests = this.requests.then(() => this.submit(form)).catch(() => {}).finally(() => {
+    this.requests = this.requests.then(() => this.submit(form)).catch(() => this.reload()).finally(() => {
       if (--this.pending === 0) this.element.ariaBusy = null
     })
   }
@@ -41,7 +42,15 @@ export default class extends Controller {
     const response = await fetch(form.action, {
       method: "POST", body: new FormData(form), headers: { Accept: "text/vnd.turbo-stream.html" }
     })
+    if (!response.ok || response.redirected) throw new Error(`Bubble click failed: ${response.status}`)
+
     const html = await response.text()
     if (this.pending === 1) Turbo.renderStreamMessage(html)
+  }
+
+  // A click that didn't go through leaves the page's bubbles ahead of the server's,
+  // so load the page again to show the board as it really is (or the login page).
+  reload() {
+    Turbo.visit(window.location.href, { action: "replace" })
   }
 }

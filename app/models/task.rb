@@ -13,7 +13,7 @@ class Task < ApplicationRecord
   # One click on this task's bubble in for_worker's column: assigns an unassigned task to
   # for_worker, steps its progress by 25% per click, and unassigns it after 100%.
   # Bubbles in other workers' columns do nothing while the task is assigned.
-  # The lock makes quick clicks on one task take turns, so none of them is lost.
+  # The lock makes clicks on one task from different pages take turns, so none is lost.
   def advance!(for_worker)
     with_lock do
       return if worker_id && worker_id != for_worker.id
