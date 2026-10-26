@@ -87,6 +87,13 @@ input[type="password"] {
   color: green;
 }
 
+/* Dims what was just acted on until the server answers: Turbo marks a submitting form
+   aria-busy, and sortable_controller marks a dragged item. Scoped to main because
+   Turbo also marks <html> during page visits. */
+main [aria-busy] {
+  opacity: 0.5;
+}
+
 /* Board */
 
 table {
