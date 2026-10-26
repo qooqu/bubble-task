@@ -70,27 +70,41 @@ export default class extends Controller {
 
   move(event) {
     event.preventDefault()
+    const dragged = this.takeDragged()
     const target = event.currentTarget
-    const items = this.itemTargets.filter(item => item.dataset.group === this.dragged.dataset.group)
-    const ids = items.map(item => item.dataset.id).filter(id => id !== this.dragged.dataset.id)
-    ids.splice(items.indexOf(target), 0, this.dragged.dataset.id)
+    if (!dragged || dragged === target) return
 
-    const movingUp = items.indexOf(this.dragged) > items.indexOf(target)
+    const items = this.itemTargets.filter(item => item.dataset.group === dragged.dataset.group)
+    const ids = items.map(item => item.dataset.id).filter(id => id !== dragged.dataset.id)
+    ids.splice(items.indexOf(target), 0, dragged.dataset.id)
+
+    const movingUp = items.indexOf(dragged) > items.indexOf(target)
     const targetCells = this.cellsOf(target)
-    this.cellsOf(this.dragged).forEach((cell, i) => movingUp ? targetCells[i].before(cell) : targetCells[i].after(cell))
+    this.cellsOf(dragged).forEach((cell, i) => movingUp ? targetCells[i].before(cell) : targetCells[i].after(cell))
 
     const body = new FormData()
     ids.forEach(id => body.append("ids[]", id))
-    this.enqueue(this.dragged.dataset.orderUrl, "PATCH", body)
+    this.enqueue(dragged.dataset.orderUrl, "PATCH", body)
   }
 
   trash(event) {
     event.preventDefault()
-    this.cellsOf(this.dragged).forEach(cell => cell.remove())
-    this.enqueue(this.dragged.dataset.url, "DELETE")
+    const dragged = this.takeDragged()
+    if (!dragged) return
+
+    this.cellsOf(dragged).forEach(cell => cell.remove())
+    this.enqueue(dragged.dataset.url, "DELETE")
   }
 
   // private
+
+  // Ends the drag and returns its item on the board as it is now. The server's board
+  // can replace the page mid-drag, leaving this.dragged detached (and its dragend unfired).
+  takeDragged() {
+    const { group, id } = this.dragged.dataset
+    this.dragged = null
+    return this.itemTargets.find(item => item.dataset.group === group && item.dataset.id === id)
+  }
 
   add(event, guess) {
     event.preventDefault()
@@ -134,7 +148,7 @@ export default class extends Controller {
   enqueue(url, method, body) {
     this.pending++
     this.element.ariaBusy = "true"
-    this.requests = this.requests.then(() => this.send(url, method, body)).catch(() => this.reload()).finally(() => {
+    this.requests = this.requests.then(() => this.send(url, method, body)).catch((error) => this.reload(error)).finally(() => {
       if (--this.pending === 0) this.element.ariaBusy = null
     })
   }
@@ -153,7 +167,8 @@ export default class extends Controller {
 
   // A request that didn't go through leaves the page ahead of the server, so load the
   // page again to show the board as it really is (or the login page).
-  reload() {
+  reload(error) {
+    console.error(error)
     Turbo.visit(window.location.href, { action: "replace" })
   }
 }
