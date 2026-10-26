@@ -28,6 +28,18 @@ class BoardTest < ApplicationSystemTestCase
     end
   end
 
+  test "clicking a bubble several times quickly" do
+    bubble = find_button("Ship, Bob")
+    assert_includes bubble[:class], "bubble-50"
+
+    3.times { bubble.click }
+    assert_selector "button.bubble-na[aria-label='Ship, Bob']"
+    assert_no_selector "[aria-busy]"
+
+    visit root_path
+    assert_selector "button.bubble-na[aria-label='Ship, Bob']"
+  end
+
   test "dragging a task onto another to reorder, and onto the trash to delete it" do
     fill_in "New task name", with: "Paint"
     send_keys :enter

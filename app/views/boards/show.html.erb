@@ -14,7 +14,9 @@
   <%= form.text_field :name, required: true, maxlength: 50, autocomplete: "off", placeholder: "Add a task…", aria: { label: "New task name" } %>
 <% end %>
 
-<%= render "boards/board", workers: @workers, tasks: @tasks %>
+<div data-controller="bubbles">
+  <%= render "boards/board", workers: @workers, tasks: @tasks %>
+</div>
 
 <ul id="howto">
   <li>Click a bubble to assign a task.</li>
