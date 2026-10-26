@@ -28,6 +28,17 @@ class BoardTest < ApplicationSystemTestCase
     end
   end
 
+  test "clicking a bubble several times quickly" do
+    bubble = find_button("Ship, Bob")
+    assert_includes bubble[:class], "bubble-50"
+
+    3.times { bubble.click }
+    assert_selector "button.bubble-na[aria-label='Ship, Bob']"
+
+    reload_once_saved
+    assert_selector "button.bubble-na[aria-label='Ship, Bob']"
+  end
+
   test "dragging a task onto another to reorder, and onto the trash to delete it" do
     fill_in "New task name", with: "Paint"
     send_keys :enter
@@ -39,5 +50,16 @@ class BoardTest < ApplicationSystemTestCase
     find("#board tbody th", text: "Ship").drag_to find("#board [aria-label=Trash]")
     assert_no_selector "#board tbody th", text: "Ship"
     assert_selector "#board tbody th", text: "Paint"
+
+    reload_once_saved
+    assert_no_selector "#board tbody th", text: "Ship"
+    assert_selector "#board tbody th", text: "Paint"
   end
+
+  private
+    # The board shows actions before the server has saved them, and is busy until it has.
+    def reload_once_saved
+      assert_no_selector "[aria-busy]"
+      visit root_path
+    end
 end
