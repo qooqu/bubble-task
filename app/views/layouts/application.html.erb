@@ -33,12 +33,15 @@
       <% end %>
       <ul>
         <% if authenticated? && !Current.user.guest? %>
-          <li><%= Current.user.email_address %></li>
+          <%= tag.li Current.user.email_address, class: "email", title: Current.user.email_address %>
           <li><%= button_to "Log out", session_path, method: :delete %></li>
         <% else %>
-          <% if authenticated? %><li>Guest</li><% end %>
-          <li><%= link_to "Sign up", new_registration_path %></li>
-          <li><%= link_to "Log in", new_session_path %></li>
+          <% unless current_page?(new_registration_path) %>
+            <li><%= link_to "Sign up", new_registration_path, class: "primary" %></li>
+          <% end %>
+          <% unless current_page?(new_session_path) %>
+            <li><%= link_to "Log in", new_session_path %></li>
+          <% end %>
         <% end %>
       </ul>
     </nav>
