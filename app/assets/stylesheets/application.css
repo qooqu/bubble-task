@@ -210,6 +210,19 @@ main [aria-busy] {
   opacity: 0.5;
 }
 
+.guest-banner {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--accent-soft);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  font-size: 0.875rem;
+}
+
+.guest-banner p + p {
+  color: var(--muted);
+}
+
 .add-forms {
   display: flex;
   flex-wrap: wrap;
