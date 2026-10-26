@@ -151,17 +151,17 @@ td {
 
 .bubble-25 {
   border: 2px solid black;
-  background-image: radial-gradient(circle, black 25%, white 25%);
+  background-image: radial-gradient(circle, black 25%, white calc(25% + 1px));
 }
 
 .bubble-50 {
   border: 2px solid black;
-  background-image: radial-gradient(circle, black 42%, white 42%);
+  background-image: radial-gradient(circle, black 42%, white calc(42% + 1px));
 }
 
 .bubble-75 {
   border: 2px solid black;
-  background-image: radial-gradient(circle, black 53%, white 53%);
+  background-image: radial-gradient(circle, black 53%, white calc(53% + 1px));
 }
 
 .bubble-100 {
