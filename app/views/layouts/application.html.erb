@@ -23,7 +23,13 @@
 
   <body>
     <nav>
-      <%= link_to "Bubble Task", root_path %>
+      <%= link_to root_path do %>
+        <svg class="logo" viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="2" />
+          <circle cx="10" cy="10" r="4.5" fill="currentColor" />
+        </svg>
+        Bubble Task
+      <% end %>
       <ul>
         <% if authenticated? && !Current.user.guest? %>
           <li><%= Current.user.email_address %></li>

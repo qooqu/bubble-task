@@ -1,5 +1,3 @@
-/* Ported from the old React app (web/src/index.css and App.css on main). */
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,13 +7,63 @@
   vertical-align: baseline;
 }
 
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --text: #1f1d1a;
+  --muted: #6b645c;
+  --line: #ece7e1;
+  --line-strong: #d9d2ca;
+  --ring-faint: #cfc8bf;
+  --input-bg: #ffffff;
+  --hover: rgb(0 0 0 / 0.05);
+  --nav: #ffa500;
+  --nav-text: #1f1d1a;
+  --accent: #b45309;
+  --accent-soft: rgb(180 83 9 / 0.22);
+  --on-accent: #ffffff;
+  --alert-bg: #fdecea;
+  --alert-line: #f5c2bd;
+  --alert-text: #b42318;
+  --notice-bg: #e8f5ee;
+  --notice-line: #b7dfc8;
+  --notice-text: #146c43;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181614;
+    --text: #f2eee8;
+    --muted: #a59d93;
+    --line: #2e2a26;
+    --line-strong: #3d3833;
+    --ring-faint: #4a443e;
+    --input-bg: #1f1c19;
+    --hover: rgb(255 255 255 / 0.06);
+    --nav: #241f1b;
+    --nav-text: #f2eee8;
+    --accent: #c9834e;
+    --accent-soft: rgb(201 131 78 / 0.28);
+    --on-accent: #181614;
+    --alert-bg: #3a1d1a;
+    --alert-line: #5c2b25;
+    --alert-text: #ffb4a9;
+    --notice-bg: #15291f;
+    --notice-line: #24442f;
+    --notice-text: #8fd5ad;
+  }
+}
+
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -24,27 +72,45 @@ body {
 
 nav {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem 1rem;
   width: 100%;
-  padding: 0 1vw;
-  background: orange;
+  padding: 0.625rem 1.5rem;
+  background: var(--nav);
+  color: var(--nav-text);
+}
+
+nav a {
+  color: inherit;
 }
 
 nav > a {
-  padding: 10px;
-  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
   text-decoration: none;
 }
 
+.logo {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 nav ul {
-  display: inline;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
   list-style-type: none;
 }
 
-nav li {
-  display: inline-block;
-  margin-left: 1rem;
+nav button {
+  padding: 0.375rem 0.75rem;
+  border-color: color-mix(in srgb, var(--nav-text) 32%, transparent);
 }
 
 /* Page */
@@ -53,38 +119,86 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60vw;
+  gap: 1.5rem;
+  width: min(100% - 2rem, 48rem);
+  padding-block: 2rem 3rem;
 }
 
-main > * {
-  margin: 2vh;
+main a {
+  color: var(--accent);
 }
 
 h1 {
   font-size: 1.5rem;
+  font-weight: 600;
 }
 
 button,
 input[type="submit"] {
-  padding: 0.5rem;
-  background: #f0f0f0;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
+}
+
+/* :where keeps this at a class's specificity, so the bubble states below still win. */
+:where(button, input[type="submit"]):hover {
+  background-color: var(--hover);
+}
+
+input[type="submit"] {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+input[type="submit"]:hover {
+  filter: brightness(0.92);
 }
 
 input[type="text"],
 input[type="email"],
 input[type="password"] {
   width: 15rem;
-  margin: 0.25rem 1vw 0.25rem 0;
-  border-bottom: 1px solid black;
+  margin: 0.25rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--input-bg);
+}
+
+input:focus {
+  outline: 2px solid transparent; /* still drawn in forced-colors mode, where box-shadow isn't */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.alert,
+.notice {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 0.875rem;
 }
 
 .alert {
-  color: red;
+  border-color: var(--alert-line);
+  background: var(--alert-bg);
+  color: var(--alert-text);
 }
 
 .notice {
-  color: green;
+  border-color: var(--notice-line);
+  background: var(--notice-bg);
+  color: var(--notice-text);
 }
 
 /* Dims what was just acted on until the server answers: Turbo marks a submitting form
@@ -94,17 +208,83 @@ main [aria-busy] {
   opacity: 0.5;
 }
 
+.add-forms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.add-form {
+  position: relative;
+  flex: 1 1 14rem;
+}
+
+.add-form::before {
+  content: "+";
+  position: absolute;
+  top: 50%;
+  left: 0.875rem;
+  translate: 0 -50%;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.add-form input[type="text"] {
+  width: 100%;
+  height: 2.75rem;
+  margin: 0;
+  padding-left: 2rem;
+}
+
 /* Board */
 
+.board-frame {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
 table {
+  width: 100%;
   border-collapse: collapse;
 }
 
 th,
 td {
-  padding: 10px 15px;
-  border: 1px solid #cecfd5;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--line);
   vertical-align: middle;
+}
+
+thead th {
+  min-width: 4.5rem;
+  max-width: 8rem;
+  border-bottom-color: var(--line-strong);
+  font-size: 0.875rem;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+thead th:first-child,
+tbody th {
+  padding-inline: 1rem;
+}
+
+thead th:first-child {
+  color: var(--muted);
+}
+
+tbody th {
+  min-width: 8rem;
+  font-weight: 500;
+  text-align: start;
+  overflow-wrap: break-word;
+}
+
+tbody tr:last-child > * {
+  border-bottom: 0;
 }
 
 .grabbable {
@@ -118,8 +298,8 @@ td {
 
 .trash {
   display: block;
-  width: 2rem;
-  height: 2rem;
+  width: 1.25rem;
+  height: 1.25rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
@@ -127,36 +307,41 @@ td {
   stroke-linejoin: round;
 }
 
+/* Unassigned bubbles are a faint ring. Assigned ones are an accent ring that fills
+   from the centre as progress goes up, with a check once full. */
 .bubble {
-  display: block;
+  display: grid;
+  place-items: center;
   width: 2rem;
   height: 2rem;
+  margin-inline: auto;
   padding: 0;
+  border: 2.5px solid var(--accent);
   border-radius: 50%;
+  background-color: transparent;
+  transition: box-shadow 0.15s;
 }
 
 .bubble:hover {
-  background-color: white;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.bubble:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .bubble-na {
-  border: 2px solid grey;
-  background-color: white;
-}
-
-.bubble-00 {
-  border: 2px solid black;
-  background-image: radial-gradient(circle, black 0%, white 0%);
+  border: 1.5px solid var(--ring-faint);
 }
 
 .bubble-25,
 .bubble-50,
 .bubble-75 {
-  border: 2px solid black;
   background-image: radial-gradient(
     circle,
-    black calc(var(--fill) - 0.5px),
-    white calc(var(--fill) + 0.5px)
+    var(--accent) calc(var(--fill) - 0.5px),
+    transparent calc(var(--fill) + 0.5px)
   );
 }
 
@@ -173,27 +358,23 @@ td {
 }
 
 .bubble-100 {
-  border: 2px solid black;
-  background-image: radial-gradient(circle, black 100%, white 0%);
+  background-color: var(--accent);
+}
+
+.bubble-100::after {
+  content: "";
+  width: 0.25rem;
+  height: 0.55rem;
+  margin-top: -0.125rem;
+  border: solid var(--on-accent);
+  border-width: 0 2px 2px 0;
+  rotate: 45deg;
 }
 
 #howto {
-  list-style-type: none;
-}
-
-#howto li::before {
-  content: "-";
-  position: absolute;
-  margin-left: -1em;
-}
-
-@media (max-width: 30em) {
-  nav {
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  main {
-    width: 95vw;
-  }
+  width: 100%;
+  padding-left: 1.125rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.7;
 }
