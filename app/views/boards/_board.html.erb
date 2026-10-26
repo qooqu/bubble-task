@@ -1,4 +1,4 @@
-<table id="board" data-controller="sortable">
+<table id="board" data-controller="sortable bubbles">
   <thead>
     <tr>
       <th data-action="dragover->sortable#allowTrash drop->sortable#trash">
@@ -24,7 +24,8 @@
         <% workers.each do |worker| %>
           <td>
             <%= button_to "", task_progress_path(task, worker_id: worker.id), method: :patch,
-                  class: bubble_class(task, worker), aria: { label: "#{task.name}, #{worker.name}" } %>
+                  class: bubble_class(task, worker), aria: { label: "#{task.name}, #{worker.name}" },
+                  data: { action: "bubbles#advance" } %>
           </td>
         <% end %>
       </tr>
