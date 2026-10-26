@@ -33,11 +33,18 @@ export default class extends Controller {
     const ids = items.map(item => item.dataset.id).filter(id => id !== this.dragged.dataset.id)
     ids.splice(items.indexOf(event.currentTarget), 0, this.dragged.dataset.id)
 
-    patch(this.dragged.dataset.orderUrl, { body: { ids }, responseKind: "turbo-stream" })
+    this.markBusy(patch(this.dragged.dataset.orderUrl, { body: { ids }, responseKind: "turbo-stream" }))
   }
 
   trash(event) {
     event.preventDefault()
-    destroy(this.dragged.dataset.url, { responseKind: "turbo-stream" })
+    this.markBusy(destroy(this.dragged.dataset.url, { responseKind: "turbo-stream" }))
+  }
+
+  // Marks the dragged item busy until its request settles, as Turbo does for a submitting form.
+  markBusy(request) {
+    const item = this.dragged
+    item.setAttribute("aria-busy", "true")
+    request.finally(() => item.removeAttribute("aria-busy"))
   }
 }
