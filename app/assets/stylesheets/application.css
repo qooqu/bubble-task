@@ -149,19 +149,27 @@ td {
   background-image: radial-gradient(circle, black 0%, white 0%);
 }
 
-.bubble-25 {
+.bubble-25,
+.bubble-50,
+.bubble-75 {
   border: 2px solid black;
-  background-image: radial-gradient(circle, black 25%, white 25%);
+  background-image: radial-gradient(
+    circle,
+    black calc(var(--fill) - 0.5px),
+    white calc(var(--fill) + 0.5px)
+  );
+}
+
+.bubble-25 {
+  --fill: 25%;
 }
 
 .bubble-50 {
-  border: 2px solid black;
-  background-image: radial-gradient(circle, black 42%, white 42%);
+  --fill: 42%;
 }
 
 .bubble-75 {
-  border: 2px solid black;
-  background-image: radial-gradient(circle, black 53%, white 53%);
+  --fill: 53%;
 }
 
 .bubble-100 {
