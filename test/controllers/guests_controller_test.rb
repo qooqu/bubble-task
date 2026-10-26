@@ -9,7 +9,7 @@ class GuestsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
 
-    assert_select "nav", /Guest/
+    assert_select "nav a", "Sign up"
     assert_select "nav", { text: /guest\.invalid/, count: 0 }
     assert_select "p", /Welcome to Bubble Task!/
     assert_select "p time[datetime=?]", User.last.deletion_time.iso8601, text: "about 24 hours"

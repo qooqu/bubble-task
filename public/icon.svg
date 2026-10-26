@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
   <style>
-    svg { color: #1f1d1a; }
-    @media (prefers-color-scheme: dark) { svg { color: #f2eee8; } }
+    svg { color: #b45309; }
+    @media (prefers-color-scheme: dark) { svg { color: #c9834e; } }
   </style>
   <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="2" />
   <circle cx="10" cy="10" r="4.5" fill="currentColor" />
