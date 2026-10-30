@@ -20,6 +20,10 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <% if Rails.env.production? %>
+      <script data-goatcounter="https://bubbletask.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <% end %>
   </head>
 
   <body>
