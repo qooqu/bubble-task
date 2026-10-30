@@ -40,6 +40,10 @@ Rails.application.configure do
   # Catch outgoing mail; read it at /letter_opener.
   config.action_mailer.delivery_method = :letter_opener_web
 
+  # Report Content Security Policy violations without enforcing them, since
+  # /letter_opener and the web console use inline scripts and styles.
+  config.content_security_policy_report_only = true
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
