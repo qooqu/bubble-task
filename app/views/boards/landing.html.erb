@@ -1,0 +1,10 @@
+<section class="intro">
+  <h1>Assign tasks and track progress, one click at a time.</h1>
+  <%= button_to "Try it out", guest_path, class: "cta" %>
+  <p>No sign-up needed.</p>
+  <%= picture_tag class: "demo" do %>
+    <%= tag.source srcset: image_path("board-demo-dark.gif"), media: "(prefers-color-scheme: dark)" %>
+    <%= image_tag "board-demo.gif", width: 548, height: 306,
+          alt: "Adding a worker and a task to the board, then clicking a bubble to assign the task and step it to done" %>
+  <% end %>
+</section>

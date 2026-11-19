@@ -164,6 +164,23 @@ main a {
   color: var(--accent);
 }
 
+/* Account forms (log in, sign up, passwords): fields stacked, submit button on the right. */
+main > form {
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+}
+
+main > form input[type="submit"] {
+  align-self: flex-end;
+  margin-top: 0.25rem;
+}
+
+main > form a {
+  align-self: flex-start;
+  font-size: 0.8125rem;
+}
+
 h1 {
   font-size: 1.5rem;
   font-weight: 600;
@@ -193,6 +210,61 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
   filter: brightness(0.92);
+}
+
+/* Landing */
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 3rem;
+  text-align: center;
+}
+
+.intro h1 {
+  max-width: 22ch;
+  font-size: 1.875rem;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.intro p {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.demo {
+  max-width: 100%;
+  margin-top: 1.5rem;
+}
+
+.demo img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.cta {
+  padding: 0.875rem 2.25rem;
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.cta:hover {
+  background: var(--accent);
+  filter: brightness(0.92);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 input[type="text"],
