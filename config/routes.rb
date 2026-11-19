@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
   root "boards#show"
 
-  resource :session, only: %i[ new create destroy ]
-  resource :registration, only: %i[ new create ]
+  resource :session, only: %i[ create destroy ]
+  get "login", to: "sessions#new", as: :new_session
+  resource :registration, only: :create
+  get "signup", to: "registrations#new", as: :new_registration
   resource :guest, only: :create
   resources :passwords, param: :token, only: %i[ new create edit update ]
 

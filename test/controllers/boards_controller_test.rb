@@ -1,11 +1,16 @@
 require "test_helper"
 
 class BoardsControllerTest < ActionDispatch::IntegrationTest
-  test "show requires logging in, and creates no guest" do
+  test "show greets a logged-out visitor with the landing page, and creates no guest" do
     assert_no_difference -> { User.count } do
       get root_path
     end
-    assert_redirected_to new_session_path
+
+    assert_response :success
+    assert_select "form[action=?] button", guest_path, "Try it out"
+    assert_select "nav a", "Sign up"
+    assert_select "nav a", "Log in"
+    assert_select "#board", count: 0
   end
 
   test "show greets a logged-in user in the nav" do
