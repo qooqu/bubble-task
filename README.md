@@ -46,5 +46,10 @@ ssh -p 3768 root@207.241.173.35 'cat /var/run/reboot-required'      # if it exis
 docker compose exec web bundle update                                # then bin/ci, PR, merge and deploy
 ```
 
+- The Gemfile pins Rails to `~> 8.1.4`, so `bundle update` only brings in 8.1.x patch releases. Upgrading to a new minor or major version (8.2, 9.0) is its own PR:
+  1. Change the `rails` line in the Gemfile, run `docker compose exec web bundle update rails`, then `docker compose restart web`.
+  2. Run `docker compose exec web bin/rails app:update` and go through each config file it wants to change. Keep the project's own settings.
+  3. Leave `config.load_defaults` on the old version at first. Turn on the new defaults one at a time in `config/initializers/new_framework_defaults_*.rb`, then raise `load_defaults` and delete that file.
+  4. Fix any deprecation warnings from the test run, then run `bin/ci`. Read the [upgrade guide](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html) for that version.
 - Bump Ruby when a patch release is out, in `.ruby-version`, `Dockerfile` and `Dockerfile.dev`. That also brings in a fresh base image.
 - After updating Kamal, run `bin/kamal proxy reboot` to pick up a newer kamal-proxy.
