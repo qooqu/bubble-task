@@ -4,7 +4,7 @@
 # Gems are installed by bin/setup into the bundle volume, not baked into this image.
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=4.0.7
+ARG RUBY_VERSION=4.0.10
 FROM docker.io/library/ruby:$RUBY_VERSION-slim
 
 WORKDIR /rails
