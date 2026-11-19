@@ -33,3 +33,18 @@ bin/kamal logs                                  # follow the app's logs
 bin/kamal shell                                 # bash in the app container
 bin/kamal dbc                                   # sqlite3 on the production database
 ```
+
+## Keeping it up to date
+
+The server is a TierHive NAT VPS running Ubuntu 26.04. Ubuntu's unattended-upgrades installs security updates daily and reboots at 04:00 UTC when one needs it. The reboot setting is in `/etc/apt/apt.conf.d/52unattended-upgrades-reboot`, set up by hand because Kamal doesn't manage the host. The app containers restart on their own after a reboot.
+
+Everything else is by hand, about once a month:
+
+```sh
+ssh -p 3768 root@207.241.173.35 'apt update && apt full-upgrade -y'  # Docker and other non-security packages
+ssh -p 3768 root@207.241.173.35 'cat /var/run/reboot-required'      # if it exists, reboot
+docker compose exec web bundle update                                # then bin/ci, PR, merge and deploy
+```
+
+- Bump Ruby when a patch release is out, in `.ruby-version`, `Dockerfile` and `Dockerfile.dev`. That also brings in a fresh base image.
+- After updating Kamal, run `bin/kamal proxy reboot` to pick up a newer kamal-proxy.
